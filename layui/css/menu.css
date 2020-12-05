@@ -1,0 +1,11 @@
+@import url("layui.css");
+
+/* 顶部白色背景 */
+.layui-header {
+	background-color: #fff;
+}
+/* 左上侧logo */
+.myLogo{
+	background-color: #333 ;color: rgba(255,255,255,.8);font-weight: bold;
+}
+/*  */

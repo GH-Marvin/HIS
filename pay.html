@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>缴费</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="layui/css/register.css">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <style>
+        .layui-form-item {
+            margin-top: 14px;
+            margin-left: 40px;
+        }
+        
+        .layui-inline,
+        .layui-input-inline {
+            float: left;
+        }
+        
+        fieldset legend a {
+            color: #409eff;
+        }
+        
+        .layui-input:focus {
+            border: #409eff 2px solid;
+        }
+        
+        .layui-card {
+            position: fixed;
+            display: none;
+            right: 52px;
+            top: 58px;
+            box-shadow: none;
+            width: 160px;
+            height: 159px;
+            box-shadow: 5px 5px 5px#dddddd;
+            border: 1px solid #d2d2d2;
+        }
+        
+        .layui-card-header {
+            border-bottom: 1px solid #eeeeee;
+            background-color: #393d49;
+            color: #c2c2c2;
+            height: 40px;
+        }
+        
+        .layui-card-header .close {
+            position: absolute;
+            width: 20px;
+            line-height: 20px;
+            height: 20px;
+            padding-left: 2px;
+            top: 10px;
+            right: 6px;
+            color: #c2c2c2;
+            font-size: 16px;
+        }
+        
+        .layui-card-header .close:hover {
+            cursor: pointer;
+        }
+        
+        ul li a {
+            display: block;
+            font-size: 14px;
+            margin-left: 11px;
+            padding-left: 25px;
+            padding-right: 22px;
+            width: 62px;
+            color: #282b33;
+            border: 1px solid #393d49;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+        
+        ul li a:hover {
+            cursor: pointer;
+            background-color: #393d49;
+            color: #fff;
+        }
+        
+        .search {
+            position: fixed;
+            display: none;
+            top: 10px;
+            right: 52.5px;
+            width: 160px;
+            height: 42px;
+            z-index: 9999;
+        }
+        
+        .search input {
+            display: inline-block;
+            width: 95px;
+        }
+        
+        .search button {
+            display: inline-block;
+            width: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 置顶功能块 -->
+    <a name="form_top"></a>
+    <!-- 右侧搜索功能（隐藏） -->
+    <div class="search">
+        <input type="text" placeholder="病历号" class="layui-input"></input>
+        <button class="layui-btn" style="background-color:#393d49;">查找</button>
+    </div>
+    <!-- 右侧工具栏 -->
+    <div class="right-bar">
+
+        <a class="bar-item layui-icon layui-icon-search" id='search' title="查找"></a>
+        <a class="bar-item layui-icon layui-icon-form" id="form_lab" title="目录"></a>
+        <a class="bar-item layui-icon layui-icon-fonts-clear" id="value" title="赋值"></a>
+        <a class="bar-item layui-icon layui-icon-delete" id="clear" title="清空表单"></a>
+
+        <a href="#form_top" class="bar-item layui-icon layui-icon-top" title="置顶"></a>
+    </div>
+    <!-- 右侧目录功能（隐藏） -->
+    <div class="layui-card" id="lab">
+        <div class="layui-card-header">目录
+            <a class="close layui-icon layui-icon-close"></a>
+        </div>
+        <div class="layui-card-body" id="content" style="padding-top: 10px;">
+
+            <ul>
+                <li>
+                    <a href="#searchInfo">查询信息</a>
+                </li>
+                <li>
+                    <a href="#baseInfo">基本信息</a>
+                </li>
+                <li>
+                    <a href="#registerInfo">缴费信息</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <!-- 表单 -->
+    <form class="layui-form layui-form-pane" action="" lay-filter="pay_form">
+        <div class="form w" style="width: 750px;min-height: 950px;" id="content_form">
+            <!-- 页眉 -->
+            <div class="page_header">
+                <div class="left_pageHeader">Neuedu</div>
+                <div class="center_pageHeader">缴费前台</div>
+                <div class="right_pageHeader">Ver: 1.0.0-0.0.0</div>
+            </div>
+            <!-- 头部标签 -->
+            <div class="title1"></div>
+            <div class="title2">
+                <h1>缴费明细表</h1>
+            </div>
+            <!-- 内容 -->
+            <div style="margin-top: 150px;">
+                <!-- 患者信息查询 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend style="font-weight: 600;"><a name="searchInfo">查询信息</a></legend>
+                </fieldset>
+
+                <div class="layui-form-item" style="margin-bottom: 37px;">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="background-color: #1e9fff;color: white;font-weight: bold;border-color:  #1e9fff;">病历号</label>
+                        <div class="layui-input-inline">
+                            <input lay-verify="required|record_id" id="record_id" type="text" style="border-color: #1e9fff" name="record_id" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-search"></i>查询</button>
+                    </div>
+                </div>
+                <!-- 患者基本信息展示 -->
+
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend style="font-weight: 600;"><a name="searchInfo">基本信息</a></legend>
+                </fieldset>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-inline">
+                            <input lay-verify="required|name" id="name" id="name" type="text" name="name" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">身份证号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="identity_id" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item" style="width: 620px;margin-bottom: 37px;">
+                    <label class="layui-form-label">家庭住址</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="address" autocomplete="off" class="layui-input" disabled>
+                    </div>
+                </div>
+
+
+                <!-- 患者缴费信息展示 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend style="font-weight: 600;"><a name="searchInfo">缴费信息</a></legend>
+                </fieldset>
+
+                <div class="layui-form-item" style="width: 620px;margin-bottom: 37px;width: 680px;">
+                    <table class="layui-hide" id="tab" lay-filter="tab"></table>
+                </div>
+
+
+                <script id="toolbarDemo" type="text/html">
+                    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="getCheckData"><i class="layui-icon layui-icon-cart"></i>收费结算</button>
+                </script>
+
+            </div>
+        </div>
+    </form>
+    <script src="layui/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'element', 'table'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                $ = layui.jquery,
+                element = layui.element,
+                table = layui.table;
+
+            var count = 0;
+
+
+
+
+            $('#form_lab').on('click', function() {
+                count++;
+                switch (count % 2) {
+                    case 0:
+                        $('#lab').css('display', 'none');
+                        break;
+                    case 1:
+                        $('#lab').css('display', 'block');
+                        break;
+                }
+
+            });
+
+            $('.close').on('click', function() {
+                add++;
+                $('#lab').css('display', 'none');
+            });
+            var add = 0;
+            $('#search').on('click', function() {
+                add++;
+                switch (add % 2) {
+                    case 0:
+                        $('.search').css('display', 'none');
+                        break;
+                    case 1:
+                        $('.search').css('display', 'block');
+                        break;
+                }
+
+            });
+
+            table.render({
+                elem: '#tab',
+                toolbar: '#toolbarDemo',
+                height: '400px',
+                skin: 'line',
+                size: 'sm',
+                even: true,
+                cols: [
+                    [{
+                            type: 'checkbox',
+
+                        }, {
+                            field: 'record_id',
+                            title: '病历号',
+                            width: 80,
+
+
+                        }, {
+                            field: 'name',
+                            title: '姓名',
+                            width: 60
+                        }, {
+                            field: 'project_name',
+                            title: '项目名称',
+                            width: 107
+                        }, {
+                            field: 'price',
+                            title: '项目单价',
+                            sort: true,
+                            width: 80,
+                            templet: function(res) {
+                                return '<strong>' + res.price + '</strong>'
+                            }
+                        }, {
+                            field: 'num',
+                            title: '数量',
+                            width: 55,
+                            sort: true,
+                            totalRow: true
+                        }, {
+                            field: 'dig_time',
+                            title: '开立时间',
+                            width: 150
+
+                        }, {
+                            field: 'state',
+                            title: '开立状态',
+                            width: 80
+                        }
+
+                    ]
+                ],
+                data: [{
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "999感冒灵",
+                    "price": "10.50",
+                    "num": "3",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }, {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "project_name": "咽炎片",
+                    "price": "15.50",
+                    "num": "2",
+                    "dig_time": "2020-07-14 17:00:00",
+                    "state": "已开立",
+                }],
+                count: 5,
+                page: true
+            });
+
+            // 传给发票iframe的数据
+            var total_price = 0;
+            var bill_recordId = "";
+            var bill_name = "";
+            table.on('toolbar(tab)', function(obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                if (obj.event == 'getCheckData') {
+                    var selected_data = checkStatus.data;
+                    bill_recordId = selected_data[0].record_id;
+                    bill_name = selected_data[0].name;
+                    for (let i = 0; i < selected_data.length; i++) {
+                        total_price += selected_data[i].price * selected_data[i].num;
+
+                    }
+                    console.log(total_price);
+                    layer.open({
+                        type: 2 //此处以iframe举例
+                            ,
+                        title: '收费明细',
+                        area: ['55%', '70%'],
+                        offset: [
+                            0.14 * ($(window).height()), 0.225 * ($(window).width())
+                        ],
+                        shade: 0.3,
+                        content: "bill.html",
+                        btn: ["确认", "取消"]
+                    });
+                    return false;
+                }
+                return false;
+            });
+
+            layui.$('#value').on('click', function() {
+                form.val('pay_form', {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "identity_id": "420281200008290836",
+                    "address": "湖南省株洲市荷塘区东湖阳光"
+                });
+            });
+            layui.$('#clear').on('click', function() {
+                form.val('pay_form', {
+                    "record_id": "",
+                    "name": "",
+                    "identity_id": "",
+                    "address": ""
+                });
+            });
+
+
+
+
+
+        });
+    </script>
+
+</body>
+
+</html>

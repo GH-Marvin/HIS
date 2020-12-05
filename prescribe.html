@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>看诊</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="layui/css/register.css">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <style>
+        /* 关闭toolbar */
+        
+        .layui-table-tool-self {
+            display: none;
+        }
+        /* 调整表单table样式 */
+        
+        .form .layui-table-tool {
+            background-color: #fff;
+            color: black;
+        }
+        
+        .form .layui-table-tool-temp {
+            padding-right: 0;
+        }
+        
+        .form .layui-table th {
+            background-color: #fff;
+            color: #9da3ac;
+        }
+        
+        .toolbar_title {
+            display: inline;
+            font-size: 12px;
+        }
+        
+        .toolbar_btn {
+            display: inline;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            color: #1e9fff;
+            font-size: 12px;
+        }
+        
+        .toolbar_btn:hover {
+            cursor: pointer;
+            color: #4ea8ff;
+        }
+        
+        .layui-form-radio>i:hover,
+        .layui-form-radioed>i {
+            color: #1e9fff;
+        }
+        /* 调整左侧工具栏分页样式 */
+        
+        .layui-tab-item .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #393d49;
+        }
+        
+        .layui-table-page {
+            height: 35px;
+        }
+        
+        .layui-laypage .layui-laypage-skip,
+        .layui-table-page .layui-laypage select,
+        .layui-table-page .layui-laypage button,
+        .layui-table-page .layui-laypage input {
+            display: none;
+        }
+        
+        .layui-table-page .layui-laypage span {
+            height: 15px;
+            line-height: 15px;
+            margin-bottom: 10px;
+        }
+        /* 左侧工具栏的table样式 */
+        
+        .layui-card-body .layui-tab-item .layui-table th {
+            background-color: #393d49;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .layui-tab-item .layui-table-view .layui-table[lay-size=sm] .layui-table-cell {
+            height: 25px;
+            line-height: 25px;
+        }
+        
+        .layui-form-item {
+            margin-top: 14px;
+            margin-left: 40px;
+        }
+        
+        .layui-inline,
+        .layui-input-inline {
+            float: left;
+        }
+        /* 二级标题 */
+        
+        fieldset legend a {
+            color: #409eff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .layui-input:focus {
+            border: #409eff 2px solid;
+        }
+        
+        .layui-card {
+            position: fixed;
+            display: none;
+            right: 52px;
+            top: 58px;
+            box-shadow: none;
+            width: 165px;
+            height: 200px;
+            box-shadow: 0px 5px 5px#dddddd;
+            border: 1px solid #d2d2d2;
+            z-index: 99999;
+            /* transition: all 1s;
+            --o--transition: all 1s;
+            --moz--transition: all 1s;
+            --webkit--transition: all 1s; */
+        }
+        
+        .layui-card-header {
+            border-bottom: 1px solid #eeeeee;
+            background-color: #393d49;
+            color: #c2c2c2;
+            height: 40px;
+        }
+        
+        .layui-card-header .lab_close,
+        .list_close {
+            position: absolute;
+            width: 20px;
+            line-height: 20px;
+            height: 20px;
+            padding-left: 2px;
+            top: 10px;
+            right: 6px;
+            color: #c2c2c2;
+            font-size: 16px;
+        }
+        
+        .layui-card-header .close:hover {
+            cursor: pointer;
+        }
+        
+        ul li a {
+            display: block;
+            font-size: 10px;
+            margin-left: 5px;
+            padding-left: 25px;
+            padding-right: 22px;
+            width: 75px;
+            color: #282b33;
+            border: 1px solid #393d49;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+        
+        ul li a:hover {
+            cursor: pointer;
+            background-color: #393d49;
+            color: #fff;
+        }
+        
+        .search {
+            position: fixed;
+            display: none;
+            top: 10px;
+            right: 52.5px;
+            width: 160px;
+            height: 42px;
+            z-index: 9999;
+        }
+        
+        .search input {
+            display: inline-block;
+            width: 95px;
+        }
+        
+        .search button {
+            display: inline-block;
+            width: 60px;
+        }
+        
+        .layui-inline .layui-form-label {
+            width: 75px;
+        }
+        
+        .layui-inline .layui-input-inline {
+            width: 75px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 置顶功能块 -->
+    <a name="form_top"></a>
+    <!-- 右侧搜索功能（隐藏） -->
+    <div class="search">
+        <input type="text" placeholder="病历号" class="layui-input"></input>
+        <button class="layui-btn" style="background-color:#393d49;">查找</button>
+    </div>
+    <!-- 右侧工具栏 -->
+    <div class="right-bar">
+        <a class="bar-item layui-icon layui-icon-screen-full" id="full" title="网页全屏"></a>
+        <a class="bar-item layui-icon layui-icon-search" id='search' title="查找"></a>
+        <a class="bar-item layui-icon layui-icon-form" id="lab" title="目录"></a>
+        <a class="bar-item layui-icon layui-icon-table" id="list" title="患者列表"></a>
+        <a class="bar-item layui-icon layui-icon-fonts-clear" id="value" title="赋值"></a>
+        <a class="bar-item layui-icon layui-icon-delete" id="clear" title="清空表单"></a>
+        <a href="#form_top" class="bar-item layui-icon layui-icon-top" title="置顶"></a>
+
+    </div>
+    <!-- 右侧目录功能（隐藏） -->
+    <div class="layui-card" id="lab_content">
+        <div class="layui-card-header">目录
+            <a class="lab_close layui-icon layui-icon-close"></a>
+        </div>
+        <div class="layui-card-body" id="content" style="padding-top: 10px;">
+
+            <ul>
+                <li><a href="#currentPatientInfo">当前患者信息</a></li>
+                <li><a href="#diagnosisInfo">患者诊断结果</a></li>
+                <li><a href="#templateInfo">模板详细信息</a></li>
+                <li><a href="#prescriptionInfo">处方详细信息</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- 右侧患者列表功能（隐藏） -->
+    <div class="layui-card" id="list_content" style="top: 110px;width: 300px;display: block;height: 390px;">
+        <div class="layui-card-header">患者列表
+            <a class="list_close layui-icon layui-icon-next"></a>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-tab" style="color: #c2c2c2;">
+                <ul class="layui-tab-title">
+                    <li style="font-size: 14px;">待诊患者</li>
+                    <li class="layui-this" style="font-size: 14px;">已诊患者</li>
+                </ul>
+                <div class="layui-tab-content" style="padding: 0;">
+                    <div class="layui-tab-item " id="tab_content">
+                        <table class="layui-table" id="waiting" lay-filter="waiting">
+                        </table>
+                    </div>
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table" id="done" lay-filter="done">
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <form class="layui-form layui-form-pane" action="" lay-filter="diagnose_form">
+        <div class="form w" style="width: 750px;height: 1800px;margin-left: 80px;" id="content_form">
+            <!-- 页眉 -->
+            <div class="page_header">
+                <div class="left_pageHeader">Neuedu</div>
+                <div class="center_pageHeader">心血管内科</div>
+                <div class="right_pageHeader">Ver: 1.0.0-0.0.0</div>
+            </div>
+            <!-- 头部标签 -->
+            <div class="title1"></div>
+            <div class="title2">
+                <h1>成药处方表</h1>
+            </div>
+            <div style="position: absolute;top:110px;left:620px">
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="do_prescribe" id="do_prescribe"><i class="layui-icon layui-icon-ok"></i>开立</button>
+                </div>
+                <div class="layui-inline" style="margin-left: 10px;">
+                    <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="cancel" id="cancel"><i class="layui-icon layui-icon-delete"></i>作废</button>
+                </div>
+            </div>
+            <!-- 内容 -->
+            <div style="margin-top: 150px;">
+                <!-- 当前患者信息 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend><a name="currentPatientInfo">当前患者信息</a></legend>
+                </fieldset>
+                <div class="layui-form-item" style="margin-bottom: 37px;padding-top: 20px;">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="background-color: #1e9fff;color: white;font-weight: bold;border: 1px solid #1e9fff;">病历号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="record_id" style="border: 2px solid #1e9fff;" name="record_id" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="name" name="name" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">性别</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="sex" name="sex" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">年龄</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="age" name="age" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- 超出高度时，显示患者信息 -->
+                <div class="sticky_info" id="target" style="position: sticky;padding-left: 0px;top:15px;width: 100%;height: 70px;background-color: #fff;z-index: 999;box-shadow: 0px 3px 10px #dddddd;border-radius: 5px;display: none;">
+                    <div class="layui-form-item" style="padding-top: 20px;">
+                        <div class="layui-inline">
+                            <input class="blue_tag" id="sticky_info" style="height: 30px;line-height: 30px;width: 250px;" disabled></input>
+                        </div>
+                        <div class="layui-inline">
+                            <input class="grey_tag" id="sticky_diagnosis" style="height: 30px;line-height: 30px;width: 250px;" disabled></input>
+                        </div>
+                        <div class="layui-inline">
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="do_prescribe" id="do_prescribe"><i class="layui-icon layui-icon-ok"></i>开立</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button class="layui-btn layui-btn-danger layui-btn-sm" lay-submit="" lay-filter="cancel" id="cancel"><i class="layui-icon layui-icon-delete"></i>作废</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 当前患者诊断结果 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend><a name="diagnosisInfo">门诊诊断结果</a></legend>
+                </fieldset>
+                <div class="layui-form-item" style="margin-bottom: 37px;">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="background-color: #c2c2c2;color: white;font-weight: bold;border: 1px solid #c2c2c2;width: 100px;">西医诊断</label>
+                        <div class="layui-input-inline" style="width: 200px;">
+                            <input type="text" id="west_diagnosis" name="west_diagnosis" autocomplete="off" class="layui-input" style="border: 2px solid #c2c2c2;" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:120px;color: #a8aaaf;text-decoration: line-through;">【中医诊断】</label>
+                        <div class="layui-input-inline" style="width: 200px">
+                            <input type="text" id="tcm_diagnosis" name="tcm_diagnosis" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 处方模板选择 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend><a name="templateInfo">模板详细信息</a></legend>
+                </fieldset>
+
+                <div class="layui-tab" style="color: #c2c2c2;margin-left: 40px;">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">处方模板</li>
+                        <li>常用药品*</li>
+                        <li>建议方案*</li>
+                        <li>历史处方*</li>
+                    </ul>
+                    <div class="layui-tab-content" style="padding: 0;margin-bottom: 37px;">
+                        <div class="layui-tab-item layui-show">
+                            <div class="layui-form-item" style="padding: 0;margin: 0;">
+                                <div class="layui-inline">
+                                    <table class="layui-table" id="template" lay-filter="template"></table>
+                                </div>
+                                <div class="layui-inline">
+                                    <table class="layui-table" id="template_item" lay-filter="template_item"></table>
+
+                                </div>
+
+                            </div>
+                            <!-- 模板表头 -->
+                            <script id="template_toolbar" type="text/html">
+                                <div class="toolbar_title" style="margin-left:15px;">名称：</div>
+                                <input type="text" class="layui-input" style="display: inline;height:25px;width:150px;font-size:12px" placeholder="请输入模板名称">
+                                <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;">查询</button>
+                            </script>
+                            <!-- 模板明细表头 -->
+                            <script id="templateItem_toolbar" type="text/html">
+                                <div class="toolbar_title">模板明细</div>
+                                <a class="toolbar_btn">使用该模板</a>
+                            </script>
+                        </div>
+                        <div class="layui-tab-item" style="height: 138px;padding-top: 20px;color: #fe6600;">
+                            开发中...
+                        </div>
+                        <div class="layui-tab-item" style="height: 138px;padding-top: 20px;color: #fe6600;">
+                            开发中...
+                        </div>
+                        <div class="layui-tab-item" style="height: 138px;padding-top: 20px;color: #fe6600;">
+                            开发中...
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 模板详细 -->
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend><a name="prescriptionInfo">处方详细信息</a></legend>
+                </fieldset>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <table class="layui-table" id="prescription" lay-filter="prescription"></table>
+                    </div>
+                    <div class="layui-inline">
+                        <table class="layui-table" id="prescription_item" lay-filter="prescription_item"></table>
+                    </div>
+                </div>
+
+                <!-- 处方表头 -->
+                <script id="prescription_toolbar" type="text/html">
+                    <div class="grey_tag">门诊处方:</div>
+                    <a class="toolbar_btn" lay-event="add_prescription"><i class="layui-icon layui-icon-add-circle-fine" style="font-size:12px;"></i>增方</a>
+                </script>
+
+                <!-- 处方详细表头 -->
+                <script id="prescriptionItem_toolbar" type="text/html">
+                    <div class="blue_tag">本处方金额合计:</div>
+                    <div class="orange_tag">0.00元</div>
+                    <a class="toolbar_btn" lay-event="add_medicine"><i class="layui-icon layui-icon-add-circle-fine" style="font-size:12px;"></i>增药</a>
+                </script>
+                <!-- 表格删除按钮 -->
+                <script type="text/html" id="bar">
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+
+
+
+            </div>
+        </div>
+
+    </form>
+    <script src="jquery/jquery.min.js"></script>
+    <script src="layui/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'layedit', 'element', 'table'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                table = layui.table,
+                $ = layui.jquery;
+
+            var lab_count = 0;
+            var search_count = 0;
+            var list_count = 1;
+            var full_count = 1;
+            $('.right-bar').on('load', function() {
+                var h = document.documentElement.scrollHeight;
+                if (h > parent.window.document.documentElement.scrollHeight) {
+                    console.log(parent.window.document.documentElement.scrollHeight);
+                    console.log(h);
+                    $('.right-bar').css('height', h);
+                } else {
+                    $('.right-bar').css('height', parent.window.document.documentElement.scrollHeight);
+                }
+            })
+            $('#lab').on('click', function() {
+                lab_count++;
+                $('.form').css('margin-left', 'auto');
+                switch (lab_count % 2) {
+                    case 0:
+                        $('#lab_content').css('display', 'none');
+                        break;
+                    case 1:
+                        if ($("#list_content").css('display') == 'block') {
+                            list_count++;
+                            $("#list_content").css('display', 'none');
+                        }
+                        $('#lab_content').css('display', 'block');
+                        break;
+                }
+
+            });
+            $('#list').on('click', function() {
+                list_count++;
+                switch (list_count % 2) {
+
+                    case 0:
+                        $('#list_content').css('display', 'none');
+                        $('.form').css('margin-left', 'auto');
+                        break;
+                    case 1:
+                        if ($("#lab_content").css('display') == 'block') {
+                            $("#lab_content").css('display', 'none');
+                            lab_count++;
+                        }
+                        $('#list_content').css('display', 'block');
+                        $('.form').css('margin-left', '80px');
+                        break;
+                }
+
+            });
+            $('.lab_close').on('click', function() {
+                lab_count++;
+                $('#lab_content').css('display', 'none');
+            });
+            $('.list_close').on('click', function() {
+                list_count++;
+                $('.form').css('margin-left', 'auto');
+                $('#list_content').css('display', 'none');
+            });
+            $('#search').on('click', function() {
+                table.reload('#done', {
+
+                    where: {
+                        height: '117'
+                    }
+                });
+                search_count++;
+                switch (search_count % 2) {
+                    case 0:
+                        $('.search').css('display', 'none');
+                        break;
+                    case 1:
+                        $('.search').css('display', 'block');
+                        break;
+                }
+
+            });
+            $('#full').on('click', function() {
+                full_count++;
+                switch (full_count % 2) {
+                    case 0:
+                        $('.form').css("width", "1055px");
+                        $('.form').css("height", "1300px");
+                        document.getElementById('full').className = 'bar-item layui-icon layui-icon-screen-restore';
+                        break;
+                    case 1:
+                        $('.form').css("width", "750px");
+                        $('.form').css("height", "1800px");
+                        document.getElementById('full').className = 'bar-item layui-icon layui-icon-screen-full';
+                        break;
+                }
+            });
+            table.render({
+                elem: '#waiting',
+                skin: 'line',
+                size: 'sm',
+                height: 'full',
+                text: {
+                    none: '数据接口异常'
+                },
+                page: {
+                    limit: 5,
+                    // limits: [15, 30, 50, 100]
+                }, //开启分页
+                cols: [
+                    [{
+                        field: 'record_id',
+                        title: '病历号',
+                        width: 78
+
+                    }, {
+                        field: 'name',
+                        title: '姓名',
+                        width: 60
+                    }, {
+                        field: 'sex',
+                        title: '性别',
+                        width: 60
+                    }, {
+                        field: 'age',
+                        title: '年龄',
+                        width: 69
+                    }]
+                ],
+                data: [{
+                    "record_id": "600601",
+                    "name": "张三",
+                    "sex": "男",
+                    "age": "18",
+
+                }, {
+                    "record_id": "600603",
+                    "name": "李四",
+                    "sex": "男",
+                    "age": "19",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }, {
+                    "record_id": "600609",
+                    "name": "李白",
+                    "sex": "男",
+                    "age": "29",
+
+                }]
+
+            });
+            table.render({
+                elem: '#done',
+                height: 'full',
+                skin: 'line',
+                size: 'sm',
+                page: {
+                    limit: 5,
+                }, //开启分页
+                cols: [
+                    [{
+                        field: 'record_id',
+                        title: '病历号',
+                        width: 79
+                    }, {
+                        field: 'name',
+                        title: '姓名',
+                        width: 60
+                    }, {
+                        field: 'sex',
+                        title: '性别',
+                        width: 60
+                    }, {
+                        field: 'age',
+                        title: '年龄',
+                        width: 68.4
+                    }, , {
+                        field: 'west_diagnosis',
+                        title: '西医诊断',
+                        width: 120
+                    }]
+                ],
+                data: [{
+                    "record_id": "600605",
+                    "name": "王五",
+                    "sex": "男",
+                    "age": "48",
+                    "west_diagnosis": "流行性感冒"
+
+                }, {
+                    "record_id": "600607",
+                    "name": "赵六",
+                    "sex": "女",
+                    "age": "29",
+                    "west_diagnosis": "流行性感冒"
+                }, {
+                    "record_id": "600607",
+                    "name": "赵六",
+                    "sex": "女",
+                    "age": "29",
+                    "west_diagnosis": "流行性感冒"
+                }, {
+                    "record_id": "600607",
+                    "name": "赵六",
+                    "sex": "女",
+                    "age": "29",
+                    "west_diagnosis": "流行性感冒"
+                }, {
+                    "record_id": "600607",
+                    "name": "赵六",
+                    "sex": "女",
+                    "age": "29",
+                    "west_diagnosis": "流行性感冒"
+                }]
+            });
+
+            table.render({
+                elem: '#prescription',
+                skin: 'line',
+                size: 'sm',
+                page: {
+                    limit: 3
+                },
+                toolbar: '#prescription_toolbar',
+                cols: [
+                    [{
+                            type: 'radio',
+                            fixed: "left"
+                        }, {
+                            field: 'pre_name',
+                            title: '模板名称',
+                            width: 101,
+                            align: 'center',
+                            fixed: 'left'
+                        }, {
+                            field: 'state',
+                            title: '状态',
+                            width: 70,
+                            fixed: 'left'
+                        }, {
+                            field: 'operation',
+                            title: '操作',
+                            width: 80,
+                            fixed: 'left',
+                            toolbar: "#bar",
+
+                        }
+
+                    ]
+                ],
+                data: [{
+                    "pre_name": "支气管哮喘",
+                    "state": "未开立"
+                }, {
+                    "pre_name": "支气管哮喘",
+                    "state": "未开立"
+                }, {
+                    "pre_name": "支气管哮喘",
+                    "state": "未开立"
+                }, {
+                    "pre_name": "支气管哮喘",
+                    "state": "未开立"
+                }, {
+                    "pre_name": "支气管哮喘",
+                    "state": "未开立"
+                }]
+
+            });
+            table.render({
+                elem: '#prescription_item',
+                skin: 'line',
+                size: 'sm',
+                toolbar: '#prescriptionItem_toolbar',
+                text: {
+                    none: "无数据"
+                },
+                page: {
+                    limit: 3
+                },
+                cols: [
+                    [{
+                        type: 'checkbox',
+                        fixed: "left"
+                    }, {
+                        field: 'pre_name',
+                        title: '药品名称',
+                        align: 'center',
+                        width: 120,
+                        fixed: 'left'
+                    }, {
+                        field: 'format',
+                        title: '规格',
+                        width: 100,
+                        fixed: 'left'
+                    }, {
+                        field: 'price',
+                        title: '单价',
+                        width: 55,
+                        fixed: 'left'
+                    }, {
+                        field: 'use',
+                        title: '用法',
+                        width: 87,
+                        fixed: 'left'
+                    }, {
+                        field: 'dosage',
+                        title: '用量',
+                        width: 55,
+                        fixed: 'left'
+                    }, {
+                        field: 'frequency',
+                        title: '频次',
+                        width: 55,
+                        fixed: 'left'
+                    }, {
+                        field: 'num',
+                        title: '数量',
+                        width: 55,
+                        fixed: 'left'
+                    }, {
+                        field: 'operation',
+                        title: '操作',
+                        width: 80,
+                        fixed: 'left',
+                        toolbar: "#bar"
+                    }]
+                ],
+                data: [{}]
+
+            });
+            table.render({
+                elem: '#template',
+                skin: 'line',
+                size: 'sm',
+                toolbar: '#template_toolbar',
+                page: {
+                    limit: 3
+                },
+
+                cols: [
+                    [{
+                        field: 'name',
+                        title: '模板名称',
+                        width: 220,
+                        fixed: 'left'
+                    }, {
+                        field: 'field',
+                        title: '范围',
+                        width: 80,
+                        fixed: 'left'
+                    }]
+                ],
+                data: [{
+                    'name': '春季常发性感冒',
+                    'field': '全院'
+                }, {
+                    'name': '春季常发性感冒',
+                    'field': '全院'
+                }, {
+                    'name': '春季常发性感冒',
+                    'field': '全院'
+                }, {
+                    'name': '春季常发性感冒',
+                    'field': '全院'
+                }, {
+                    'name': '春季常发性感冒',
+                    'field': '全院'
+                }]
+
+            });
+
+            table.render({
+                elem: '#template_item',
+                skin: 'line',
+                size: 'sm',
+                toolbar: '#templateItem_toolbar',
+                page: {
+                    limit: 3
+                },
+
+                cols: [
+                    [{
+                            field: 'pre_name',
+                            title: '药品名称',
+                            width: 150,
+                            fixed: 'left'
+                        }, {
+                            field: 'format',
+                            title: '药品规格',
+                            width: 150,
+                            fixed: 'left'
+                        }, {
+                            field: 'unit',
+                            title: '单位',
+                            width: 100,
+                            fixed: 'left'
+                        }, {
+                            field: 'use',
+                            title: '用法',
+                            width: 100,
+                            fixed: 'left'
+                        }, {
+                            field: 'dosage',
+                            title: '用量',
+                            width: 95,
+                            fixed: 'left'
+                        }, {
+                            field: 'frequency',
+                            title: '频次',
+                            width: 60,
+                            fixed: 'left'
+                        }
+
+                    ]
+                ],
+                data: [{
+                    'pre_name': '山药颗粒',
+                    'format': '1g/10g/1袋',
+                    'unit': '袋',
+                    'use': '1',
+                    'dosage': '1',
+                    'frequency': '1'
+                }, {
+                    'pre_name': '山药颗粒',
+                    'format': '1g/10g/1袋',
+                    'unit': '袋',
+                    'use': '1',
+                    'dosage': '1',
+                    'frequency': '1'
+                }, {
+                    'pre_name': '山药颗粒',
+                    'format': '1g/10g/1袋',
+                    'unit': '袋',
+                    'use': '1',
+                    'dosage': '1',
+                    'frequency': '1'
+                }, {
+                    'pre_name': '山药颗粒',
+                    'format': '1g/10g/1袋',
+                    'unit': '袋',
+                    'use': '1',
+                    'dosage': '1',
+                    'frequency': '1'
+                }, {
+                    'pre_name': '山药颗粒',
+                    'format': '1g/10g/1袋',
+                    'unit': '袋',
+                    'use': '1',
+                    'dosage': '1',
+                    'frequency': '1'
+                }]
+
+            });
+
+            table.on('toolbar(prescription)', function(obj) {
+                if (obj.event == 'add_prescription') {
+                    layer.open({
+                        type: 1,
+                        content: '<input type="text" class="layui-input" style="width:328px;display:inline;margin-top:20px;margin-left:30px" placeholder="请输入处方名称">',
+                        title: '添加处方',
+                        area: ['30%', '30%'],
+                        offset: [
+                            0.35 * ($(window).height()), 0.32 * ($(window).width())
+                        ],
+                        shade: 0.5,
+                        btn: ["添加", "取消"]
+                    });
+
+                }
+            });
+
+
+            table.on('toolbar(prescription_item)', function(obj) {
+                if (obj.event == 'add_medicine') {
+                    layer.open({
+                        type: 2,
+                        content: 'medicineAdd.html',
+                        title: '添加药品',
+                        area: ['85%', '80%'],
+                        offset: [
+                            0.1 * ($(window).height()), 0.07 * ($(window).width())
+                        ],
+                        shade: 0.5,
+                        btn: ["添加", "取消"]
+                    });
+
+                }
+            });
+
+
+            $(function() {
+
+                $(window).scroll(function() {
+                    slideIn($(".target"));
+                });
+
+                function slideIn(obj) {
+                    var targetHeight = 500;
+
+                    var scrollTop = $(this).scrollTop();
+
+                    if (scrollTop > targetHeight) {
+                        $('#target').css('display', "block");
+                        // if ($('#list_content').css('display') == "block") {
+                        //     $('#list_content').css('display', "none");
+                        //     list_count++;
+                        // }
+
+                        // $('.form').css("width", "1055px");
+
+                    } else {
+                        $('#target').css('display', "none");
+
+                        // $('.form').css("width", "750px");
+
+                    }
+                };
+
+            });
+            len = layui.table.cache["done"].length;
+            base = layui.table.cache["done"][0];
+            document.getElementById("record_id").value = base.record_id;
+            document.getElementById("name").value = base.name;
+            document.getElementById("sex").value = base.sex;
+            document.getElementById("age").value = base.age;
+            document.getElementById("sticky_info").value = "姓名:" + base.name + ";病历号:" + base.record_id + ";年龄:" + base.age + ";性别:" + base.sex;
+            document.getElementById("sticky_diagnosis").value = "【西医诊断】" + base.west_diagnosis;
+            document.getElementById("west_diagnosis").value = base.west_diagnosis;
+            table.on('row(done)', function(obj) {
+                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
+                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
+                document.getElementById("record_id").value = obj.data.record_id;
+                document.getElementById("name").value = obj.data.name;
+                document.getElementById("sex").value = obj.data.sex;
+                document.getElementById("age").value = obj.data.age;
+                document.getElementById("west_diagnosis").value = obj.data.west_diagnosis;
+                document.getElementById("sticky_info").value = "姓名:" + obj.data.name + ";病历号:" + obj.data.record_id + ";年龄:" + obj.data.age + ";性别:" + obj.data.sex;
+                document.getElementById("sticky_diagnosis").value = "【西医诊断】" + obj.data.west_diagnosis;
+                return false;
+            });
+
+            form.verify({
+                content: function(value) {
+                    layedit.sync(editIndex);
+                }
+            });
+
+            form.on('submit(do_prescribe)', function(data) {
+                layer.alert(JSON.stringify(data.field), {
+                    title: '最终的提交信息',
+                    offset: [
+                        0.1 * $(window).height(),
+                        0.35 * $(window).width()
+                    ]
+                });
+                return false;
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

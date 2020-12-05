@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>东软云医院-HIS-挂号后台</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="layui/css/menustyle.css">
+    <style>
+        .bar-title {
+            display: block;
+            position: absolute;
+            top: 0px;
+            right: 17px;
+            height: 43px;
+            width: 36.1px;
+            line-height: 45px;
+            font-size: 22px;
+            padding-left: 14px;
+            background-color: #393d49;
+            color: #c2c2c2;
+            z-index: 1000000;
+        }
+        
+        .bar-title:hover {
+            background-color: #393d49;
+            color: #c2c2c2;
+        }
+    </style>
+
+</head>
+
+
+<body class="layui-layout-body close-footer" style="min-width: 1536px;width: 100%;overflow-y: hidden;overflow-x: auto;">
+    <div class="layui-layout layui-layout-admin">
+
+        <div class="layui-header" style="min-width: 1536px;display: block;">
+
+            <div class="layui-logo header w" style="height:58px;border-bottom: #20222a solid 1px;">
+                <i class="layui-icon layui-icon-upload-drag logo"></i>
+                <h1>东软云</h1>
+            </div>
+            <!-- 头部区域（可配合layui已有的水平导航） -->
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item"><a href="">控制台</a></li>
+                <li class="layui-nav-item"><a href="">快捷管理</a></li>
+                <li class="layui-nav-item"><a href="">关于</a></li>
+                <li class="layui-nav-item" style="margin-left: 27px;">
+                    <input id="searchAll" type="text" name="searchAll" autocomplete="off" placeholder="搜索..." class="layui-input" style="width: 350px;">
+                </li>
+            </ul>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <i class="layui-icon layui-icon-user"></i> 挂号员
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="">基本资料</a></dd>
+                        <dd><a href="">安全设置</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="login.html">
+                        <i class="layui-icon layui-icon-logout"></i>
+                        <cite>退出</cite>
+
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="body w">
+
+            <div class="layui-side layui-bg-black" style="position: absolute;">
+                <div class="layui-side-scroll">
+
+                    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+
+                        <li class="layui-nav-item layui-nav-itemed">
+                            <a class="" href="javascript:;">
+                                <i class="layui-icon layui-icon-survey"></i>
+                                <cite>挂号</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="11" data-title="现场挂号" data-url="register" data-type="tabAdd">现场挂号</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="12" data-title="退号" data-url="backRegister" data-type="tabAdd">退号</a></dd>
+                                <dd><a href="javascript:;">其他*</a></dd>
+
+                            </dl>
+                        </li>
+                        <li class="layui-nav-item layui-nav-itemed">
+                            <a href="javascript:;">
+                                <i class="layui-icon layui-icon-rmb"></i>
+                                <cite>费用</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="21" data-title="收费" data-url="pay" data-type="tabAdd">收费</a></dd>
+                                <dd><a href="javascript:;">退费</a></dd>
+                                <dd><a href="javascript:;">费用查询</a></dd>
+                                <dd><a href="javascript:;">其他*</a></dd>
+                            </dl>
+                        </li>
+                        <li class="layui-nav-item layui-nav-itemed">
+                            <a href="javascript:;">
+                                <i class="layui-icon layui-icon-file"></i>
+                                <cite>发票</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a href="javascript:;">发票补打</a></dd>
+                                <dd><a href="javascript:;">发票重打</a></dd>
+                                <dd><a href="javascript:;">其他*</a></dd>
+                            </dl>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="layui-body" style="position: absolute;background-color: #fff;min-width: 1336px;overflow-y:auto;">
+                <!-- 内容主体区域 -->
+
+
+                <div class="layui-tab" id="tab" lay-filter="demo" lay-allowclose="true" style="position: absolute;color: #c2c2c2;background-color: #fff;margin: 0px;width: 100%;">
+
+                    <a class="bar-title layui-icon layui-icon-app" title="工具栏"></a>
+                    <ul class="layui-tab-title" style="position: sticky; top :1px;display: block;z-index: 1000;background-color:#fff;display: block;">
+                    </ul>
+                    <div class="layui-tab-content" style="background-color: #f2f2f2; margin: 0;padding: 0;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="layui/layui.js"></script>
+    <script src="jquery/jquery.min.js"></script>
+
+    <script>
+        //JavaScript代码区域
+
+        layui.use(['form', 'layedit', 'laydate', 'element'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                laydate = layui.laydate,
+                element = layui.element;
+
+
+
+            //触发事件
+
+
+            $(".layui-body").css("bottom", 0);
+            var active = {
+                //在这里给active绑定几项事件，后面可通过active调用这些事件
+                tabAdd: function(url, id, name) {
+                    //新增一个Tab项 传入三个参数，分别对应其标题，tab页面的地址，还有一个规定的id，是标签中data-id的属性值
+                    element.tabAdd('demo', {
+                        title: name,
+                        content: '<iframe id="iframe" data-frameid="' + id + '"  frameborder="0" src="' + url + '.html"  style="width:100%;height:100%;overflow:auto;"  ></iframe>',
+                        id: id //规定好的id
+                    })
+
+                    FrameWH(); //计算iframe层的大小
+                },
+                tabChange: function(id) {
+                    //切换到指定Tab项
+
+                    element.tabChange('demo', id); //根据传入的id传入到指定的tab项
+
+                },
+                tabDelete: function(id) {
+                    element.tabDelete("demo", id); //删除
+                }
+            };
+            $(document).ready(function() {
+                active.tabAdd("pay", "21", "收费")
+                active.tabChange("21");
+            });
+
+            //当点击有site-demo-active属性的标签时，即左侧菜单栏中内容 ，触发点击事件
+            $('.site-demo-active').on('click', function() {
+                var dataid = $(this);
+
+                //这时会判断右侧.layui-tab-title属性下的有lay-id属性的li的数目，即已经打开的tab项数目
+                if ($(".layui-tab-title li[lay-id]").length <= 0) {
+                    //如果比零小，则直接打开新的tab项
+                    active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
+                } else {
+                    //否则判断该tab项是否以及存在
+
+                    var isData = false; //初始化一个标志，为false说明未打开该tab项 为true则说明已有
+                    $.each($(".layui-tab-title li[lay-id]"), function() {
+                        //如果点击左侧菜单栏所传入的id 在右侧tab项中的lay-id属性可以找到，则说明该tab项已经打开
+                        if ($(this).attr("lay-id") == dataid.attr("data-id")) {
+                            isData = true;
+                        }
+                    })
+                    if (isData == false) {
+                        //标志为false 新增一个tab项
+                        active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
+                    }
+                }
+                //最后不管是否新增tab，最后都转到要打开的选项页面上
+                active.tabChange(dataid.attr("data-id"));
+
+            });
+
+
+            function FrameWH() {
+                var w = parent.window.document.documentElement.scrollWidth;
+                var h = parent.window.document.documentElement.scrollHeight;
+                $("iframe").css("width", w - 200 + "px");
+                $("iframe").css("height", h - 105 + "px");
+
+            }
+
+            $(window).resize(function() {
+                FrameWH();
+            })
+        });
+    </script>
+</body>
+
+</html>

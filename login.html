@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>东软云医院</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="layui/css/mstyle.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<style>
+    .layui-input:hover {
+        border-color: #fe6600!important;
+    }
+    
+    .layui-input:focus {
+        border-color: #fe6600!important;
+        border-width: 2px;
+    }
+    
+    .layui-form-checkbox[lay-skin=primary]:hover i {
+        border-color: #fe6600;
+        color: #fff
+    }
+    
+    .layui-form-checked[lay-skin=primary] i {
+        border-color: #fe6600!important;
+        background-color: #fe6600;
+        color: #fff
+    }
+    
+    .layui-card {
+        background-color: rgba(255, 255, 255, 0.95);
+        position: absolute;
+        width: 445px;
+        height: 470px;
+        top: 135px;
+        right: 190px;
+        border-radius: 15px;
+        z-index: 1000;
+    }
+    
+    .layui-card-header {
+        height: 60px;
+        line-height: 60px;
+        font-size: 24px;
+        font-family: Helvetica, arial, "MI Lan Pro", "Hiragino Sans GB", "PingFang SC", "Microsoft YaHei", "微軟正黑體", "儷黑 Pro", sans-serif;
+        margin: 18px 22px 2px;
+        color: #666;
+    }
+    
+    .layui-card-header:hover {
+        cursor: pointer;
+        color: #fe6600;
+    }
+    
+    .layui-input-block {
+        margin-left: 0;
+    }
+    
+    .myIcon {
+        position: absolute;
+        font-size: 20px;
+        color: #666;
+        top: 13px;
+        left: 15px;
+    }
+    
+    .layui-input {
+        background-color: inherit;
+        padding-left: 42px;
+        height: 50px;
+        border-radius: 5px;
+    }
+    
+    .layui-btn {
+        height: 45px;
+        font-weight: bolder;
+        border-radius: 5px;
+        position: absolute;
+        background-color: rgba(254, 102, 0, 0.9);
+        top: 20px;
+    }
+    
+    .layui-form-item {
+        position: inherit;
+        margin-top: 10px;
+        width: 90%;
+        left: 20px;
+    }
+</style>
+
+<body class="layui-layout-body" style="overflow: auto;">
+    <div class="layui-layout layui-layout-admin">
+        <!-- 头部标题 -->
+
+        <!-- 轮播图片 -->
+
+        <div class="layui-carousel body w layui-anim layui-anim-scale" id="carousel">
+            <div class="mask"></div>
+            <div class="header">
+                <i class="layui-icon layui-icon-upload-drag logo"></i>
+                <h1>东软云</h1>
+            </div>
+            <div carousel-item="">
+                <div><img src="images/bg1.jpg" width="100%" height="100%"></div>
+                <div><img src="images/bg2.jpg" width="100%" height="100%"></div>
+            </div>
+            <div class="desc">
+                <h1>东软云HIS</h1>
+                <p>基于云计算资源构建可持续发展的中小型医疗卫生服务机构IT生态系统，帮助中小医院以云计算的方式建设、运维院内IT系统。</p>
+                <p>基于云计算SaaS服务模式，注册即可全面应用，微成本投入，无信息化预算瓶颈。提供医疗服务、健康管理服务、互联网+信息惠民一体化业务支撑平台。
+                </p>
+            </div>
+            <form class="layui-form login-form" action="">
+                <div class="layui-card layui-anim layui-anim-up">
+                    <div class="layui-card-header">欢迎登陆-Welcome</div>
+                    <div class="layui-card-body">
+
+                        <!-- 账号 -->
+                        <div class="layui-col-sm12 layui-col-md12">
+                            <div class="layui-form-item">
+                                <input id="username" type="text" name="username" lay-verify="required|username" autocomplete="off" placeholder="挂号员/医生账号" class="layui-input">
+                                <i class="layui-icon layui-icon-username myIcon"></i>
+                            </div>
+                        </div>
+                        <!-- 密码 -->
+                        <div class="layui-col-sm12 layui-col-md12">
+                            <div class="layui-form-item">
+                                <input id="password" type="password" name="password" lay-verify="required|password" autocomplete="off" placeholder="密码" class="layui-input">
+                                <i class="layui-icon layui-icon-password myIcon"></i>
+                            </div>
+                        </div>
+                        <!-- 验证 -->
+                        <div class="layui-col-sm12 layui-col-md12">
+                            <div class="layui-form-item" style="margin-bottom: 10px;">
+                                <div class="layui-input-block">
+                                    <div id="slider"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 记住账号|注册 -->
+                        <div class="layui-col-sm12 layui-col-md12">
+                            <div class="layui-form-inline" style="padding-top: 20px;margin-left: 22px;">
+                                <input type="checkbox" id="remember" lay-filter="remember" name="remember" title="记住账号" lay-skin="primary">
+                                <a id="register" href="javascript:;" style="position: absolute;right: 22px;color: #666;">没有账号？立即注册</a>
+                            </div>
+                        </div>
+                        <!-- 登录按钮 -->
+                        <div class="layui-col-sm12 layui-col-md12">
+                            <div class="layui-form-item" style="margin-bottom: 0px;">
+                                <button class="layui-btn layui-btn-fluid" type="button" id="login_btn" lay-submit="" lay-filter="login">立即登录</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 登录Form -->
+
+
+        <!-- 底部固定区域 -->
+
+    </div>
+    <!-- js -->
+    <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="dist/sliderVerify/sliderVerify.js"></script>
+    <script src="jquery/jquery.min.js"></script>
+    <script src="jquery/jquery.cookie.js"></script>
+    <script>
+        //初始化记住数据
+        $().ready(function() {
+            console.log($.cookie("username_cookie"))
+            if ($.cookie("rmb") == "true") {
+                $("#remember").attr("checked", true);
+                $("#username").val($.cookie("username_cookie"));
+                $("#password").val($.cookie("password_cookie"));
+
+
+            }
+        });
+        //记住账号密码方法
+        function saveUserInfo() {
+            if ($("#remember").is(':checked')) {
+                console.log("[log]账号密码已保存！")
+                var username_cookie = $("#username").val();
+                var password_cookie = $("#password").val();
+                $.cookie("rmb", "true", {
+                    expires: 7
+                });
+                $.cookie("username_cookie", username_cookie, {
+                    expires: 7
+                });
+                $.cookie("password_cookie", password_cookie, {
+                    expires: 7
+                });
+                // 存储一个带7天期限的 cookie 
+            } else {
+                console.log("[log]账号密码已取消！")
+                $.cookie("rmb", "false", {
+                    expires: -1
+                });
+                $.cookie("username_cookie", '', {
+                    expires: -1
+                });
+                $.cookie("password_cookie", '', {
+                    expires: -1
+                });
+            }
+        }
+    </script>
+    <script>
+        layui.config({
+            base: 'dist/sliderVerify/'
+        }).use(['carousel', 'form', 'layer', 'sliderVerify'], function() {
+            var carousel = layui.carousel,
+                form = layui.form,
+                $ = layui.jquery,
+                layer = layui.layer,
+                sliderVerify = layui.sliderVerify;
+            var slider = sliderVerify.render({
+                    elem: '#slider',
+                    bg: 'layui-bg-red'
+                })
+                //模拟数据
+            $('a').on('click', function() {
+                layer.alert('若跳转至医生页面-账号:bianque;密码:bianque123\n需要跳转至挂号页面-账号:ghy;密码:ghy123', {
+                    title: '提示信息'
+                })
+            });
+            //图片轮播
+            carousel.render({
+                elem: '#carousel',
+                width: 'full',
+                height: 'full'
+
+            });
+
+
+            form.verify({
+                username: function(value) {
+                    if (value.length < 3) {
+                        return '账号至少得3个字符';
+                    }
+                },
+                password: [/^[\S]{6,16}$/, '密码必须6到16位，且不能出现空格'],
+                content: function(value) {
+                    layedit.sync(editIndex);
+                }
+            });
+
+            //监听提交 
+            form.on("submit(login)", function(data) {
+
+                if (slider.isOk()) {
+                    $.ajax({
+                        url: "http://localhost:8080/user/login",
+                        type: 'post',
+                        data: JSON.stringify(data.field),
+                        contentType: "application/json",
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        beforeSend: function() {
+                            console.log(data.field);
+                        },
+                        success: function(data) {
+                            if (data.code == 1) {
+                                layer.msg(data.msg, {
+                                    icon: 5
+                                });
+                                return false;
+                            } else if (data.code == 0) {
+                                layer.msg(data.msg, {
+                                    icon: 6, //成功的表情
+                                    time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                }, function() {
+                                    window.location.href = data.data + ".html";
+                                    saveUserInfo();
+                                });
+                            }
+                        }
+                    });
+
+                } else {
+                    layer.msg("请先通过滑块验证");
+                    return false;
+                }
+
+            });
+
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>挂号</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+
+<body>
+    <form class="layui-form layui-form-pane" action="">
+        <br>
+        <br>
+        <div class="layui-form-item" style="padding-left: 45px">
+            <div class="layui-inline">
+                <label class="layui-form-label" style="color: white;background-color: #1e9fff;border-color: #1e9fff">发票号</label>
+                <div class="layui-input-inline">
+                    <input style="border-color: #1e9fff" lay-verify="required|name" id="bill_id" id="bill_id" type="text" name="bill_id" autocomplete="off" class="layui-input" required>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">病历号</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="record_id" name="record_id" autocomplete="off" class="layui-input" required>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-left: 45px">
+            <div class="layui-inline">
+                <label class="layui-form-label">患者姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" name="name" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">支付方式</label>
+                <div class="layui-input-inline">
+                    <select lay-verify="required|payType" name="payType" id="payType" lay-filter="payType">
+                    <option value="">请选择支付方式</option>
+                    <option value="1">现金</option>
+                    <option value="2">支付宝</option>
+                    <option value="3">银行卡</option>
+                </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-left: 45px">
+            <div class="layui-inline">
+                <label class="layui-form-label">应收金额</label>
+                <div class="layui-input-inline">
+                    <input lay-verify="required|name" id="should_pay" id="should_pay" type="text" name="should_pay" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">实收金额</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="fact_pay" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-left: 45px">
+            <div class="layui-inline">
+                <label class="layui-form-label">找零金额</label>
+                <div class="layui-input-inline">
+                    <input lay-verify="required|name" id="back_pay" id="back_pay" type="text" name="should_pay" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+<script src="layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'laydate', 'element'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            element = layui.element,
+            $ = layui.jquery;
+        // 接收pay.html数据
+        var total = window.parent.total_price;
+        var record = window.parent.bill_recordId;
+        var name = window.parent.bill_name;
+        console.log(total, record, name);
+        $("#should_pay").val(total);
+        $("#name").val(name);
+        $("#record_id").val(record);
+        $("#fact_pay").change(function() {
+            var a = $("#should_pay").val();
+            var b = $("#fact_pay").val();
+            var c = (b - a).toFixed(2);
+            $("#back_pay").val(c);
+        });
+
+
+    });
+</script>
+
+</html>
