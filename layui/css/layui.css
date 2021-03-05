@@ -2240,12 +2240,12 @@ hr {
 
 .layui-input:hover,
 .layui-textarea:hover {
-    border-color: #1e9fff!important
+    border-color: #1e9fff
 }
 
 .layui-input:focus,
 .layui-textarea:focus {
-    border-color: #1e9fff!important
+    border-color: #1e9fff
 }
 
 .layui-textarea {

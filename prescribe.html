@@ -148,6 +148,18 @@
             font-size: 16px;
         }
         
+        .list_refresh {
+            position: absolute;
+            width: 20px;
+            line-height: 20px;
+            height: 20px;
+            padding-left: 2px;
+            top: 10px;
+            right: 36px;
+            color: #c2c2c2;
+            font-size: 16px;
+        }
+        
         .layui-card-header .close:hover {
             cursor: pointer;
         }
@@ -238,7 +250,9 @@
     <!-- 右侧患者列表功能（隐藏） -->
     <div class="layui-card" id="list_content" style="top: 110px;width: 300px;display: block;height: 390px;">
         <div class="layui-card-header">患者列表
+            <a class="list_refresh layui-icon layui-icon-refresh"></a>
             <a class="list_close layui-icon layui-icon-next"></a>
+
         </div>
         <div class="layui-card-body">
             <div class="layui-tab" style="color: #c2c2c2;">
@@ -266,7 +280,7 @@
             <!-- 页眉 -->
             <div class="page_header">
                 <div class="left_pageHeader">Neuedu</div>
-                <div class="center_pageHeader">心血管内科</div>
+                <div class="center_pageHeader" id="dept_name"></div>
                 <div class="right_pageHeader">Ver: 1.0.0-0.0.0</div>
             </div>
             <!-- 头部标签 -->
@@ -311,6 +325,24 @@
                         <label class="layui-form-label">年龄</label>
                         <div class="layui-input-inline">
                             <input type="text" id="age" name="age" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <label class="layui-form-label">挂号单id</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="regist_id" name="regist_id" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <label class="layui-form-label">病历id</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="medical_id" name="medical_id" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <label class="layui-form-label">当前选择的模板名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="selected_template" name="selected_template" autocomplete="off" class="layui-input" disabled>
                         </div>
                     </div>
 
@@ -379,13 +411,13 @@
                             <!-- 模板表头 -->
                             <script id="template_toolbar" type="text/html">
                                 <div class="toolbar_title" style="margin-left:15px;">名称：</div>
-                                <input type="text" class="layui-input" style="display: inline;height:25px;width:150px;font-size:12px" placeholder="请输入模板名称">
-                                <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;">查询</button>
+                                <input type="text" class="layui-input" style="display: inline;height:25px;width:150px;font-size:12px" placeholder="请输入模板名称" id="template_input">
+                                <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;" data-type="template_reload" id="template_search" lay-event="template_reload">查询</button>
                             </script>
                             <!-- 模板明细表头 -->
                             <script id="templateItem_toolbar" type="text/html">
                                 <div class="toolbar_title">模板明细</div>
-                                <a class="toolbar_btn">使用该模板</a>
+                                <a class="toolbar_btn" id="useThisTemplate_btn" data-type="useThisTemplate" lay-event="useThisTemplate">使用该模板</a>
                             </script>
                         </div>
                         <div class="layui-tab-item" style="height: 138px;padding-top: 20px;color: #fe6600;">
@@ -411,7 +443,7 @@
                         <table class="layui-table" id="prescription" lay-filter="prescription"></table>
                     </div>
                     <div class="layui-inline">
-                        <table class="layui-table" id="prescription_item" lay-filter="prescription_item"></table>
+                        <table class="layui-table prescription_item_table" id="prescription_item" lay-filter="prescription_item"></table>
                     </div>
                 </div>
 
@@ -424,7 +456,7 @@
                 <!-- 处方详细表头 -->
                 <script id="prescriptionItem_toolbar" type="text/html">
                     <div class="blue_tag">本处方金额合计:</div>
-                    <div class="orange_tag">0.00元</div>
+                    <input type='button' class="orange_tag" id="total_price" value='0.00元' lay-event='calculate' />
                     <a class="toolbar_btn" lay-event="add_medicine"><i class="layui-icon layui-icon-add-circle-fine" style="font-size:12px;"></i>增药</a>
                 </script>
                 <!-- 表格删除按钮 -->
@@ -440,6 +472,7 @@
     </form>
     <script src="jquery/jquery.min.js"></script>
     <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="jquery/jquery.cookie.js"></script>
     <script>
         layui.use(['form', 'layedit', 'element', 'table'], function() {
             var form = layui.form,
@@ -448,6 +481,22 @@
                 element = layui.element,
                 table = layui.table,
                 $ = layui.jquery;
+            layer.config({
+                extend: 'myskin/style.css' //加载layer皮肤模块
+            });
+
+
+            var doctor_id = "";
+            var dept_name = "";
+            var dept_id = "";
+            $().ready(function() {
+                doctor_id = $.cookie("registerId_cookie");
+                dept_name = $.cookie("dept_cookie");
+                dept_id = $.cookie("deptId_cookie");
+                console.log("当前医生id：" + doctor_id);
+                console.log("当前科室id：" + dept_id);
+                document.getElementById('dept_name').innerHTML = $.cookie("dept_cookie");
+            });
 
             var lab_count = 0;
             var search_count = 0;
@@ -541,13 +590,28 @@
                         break;
                 }
             });
+            $('.list_refresh').on('click', function() {
+                table.reload('waiting', {
+                    url: 'http://localhost:8085/diagnose/initWaitingList/' + doctor_id,
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                }); //只重载数据
+                table.reload('done', {
+                    url: 'http://localhost:8085/diagnose/initDoneList/' + doctor_id,
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                }); //只重载数据
+            });
             table.render({
                 elem: '#waiting',
+                url: 'http://localhost:8085/diagnose/initWaitingList/' + doctor_id,
                 skin: 'line',
                 size: 'sm',
                 height: 'full',
                 text: {
-                    none: '数据接口异常'
+                    none: '暂无该科室下的病人'
                 },
                 page: {
                     limit: 5,
@@ -571,62 +635,23 @@
                         field: 'age',
                         title: '年龄',
                         width: 69
+                    }, {
+                        field: 'regist_id',
+                        title: '挂号单id',
+                        width: 69,
+                        hide: true
                     }]
                 ],
-                data: [{
-                    "record_id": "600601",
-                    "name": "张三",
-                    "sex": "男",
-                    "age": "18",
-
-                }, {
-                    "record_id": "600603",
-                    "name": "李四",
-                    "sex": "男",
-                    "age": "19",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }]
+                data: []
 
             });
             table.render({
                 elem: '#done',
+                url: 'http://localhost:8085/diagnose/initDoneList/' + doctor_id,
                 height: 'full',
+                text: {
+                    none: '该科室下暂无已诊患者'
+                },
                 skin: 'line',
                 size: 'sm',
                 page: {
@@ -649,164 +674,78 @@
                         field: 'age',
                         title: '年龄',
                         width: 68.4
-                    }, , {
+                    }, {
+                        field: 'regist_id',
+                        title: '挂号单id',
+                        width: 69,
+                        hide: true
+                    }, {
                         field: 'west_diagnosis',
                         title: '西医诊断',
+                        hide: true,
+                        width: 120
+                    }, {
+                        field: 'medical_id',
+                        title: '病历id',
+                        hide: true,
                         width: 120
                     }]
                 ],
-                data: [{
-                    "record_id": "600605",
-                    "name": "王五",
-                    "sex": "男",
-                    "age": "48",
-                    "west_diagnosis": "流行性感冒"
-
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }]
-            });
-
-            table.render({
-                elem: '#prescription',
-                skin: 'line',
-                size: 'sm',
-                page: {
-                    limit: 3
-                },
-                toolbar: '#prescription_toolbar',
-                cols: [
-                    [{
-                            type: 'radio',
-                            fixed: "left"
-                        }, {
-                            field: 'pre_name',
-                            title: '模板名称',
-                            width: 101,
-                            align: 'center',
-                            fixed: 'left'
-                        }, {
-                            field: 'state',
-                            title: '状态',
-                            width: 70,
-                            fixed: 'left'
-                        }, {
-                            field: 'operation',
-                            title: '操作',
-                            width: 80,
-                            fixed: 'left',
-                            toolbar: "#bar",
-
+                done: function(res, currentCount) {　　　　　　　　
+                    base = layui.table.cache["done"][0];
+                    $(".layui-table-body.layui-table-main tr[data-index='0']").addClass("layui-bg-blue");
+                    $("#record_id").val(base.record_id);
+                    $("#name").val(base.name);
+                    $("#sex").val(base.sex);
+                    $("#age").val(base.age);
+                    $("#regist_id").val(base.regist_id);
+                    $("#medical_id").val(base.medical_id);
+                    document.getElementById("sticky_info").value = "姓名:" + base.name + ";病历号:" + base.record_id + ";年龄:" + base.age + ";性别:" + base.sex;
+                    document.getElementById("sticky_diagnosis").value = "【西医诊断】" + base.west_diagnosis;
+                    document.getElementById("west_diagnosis").value = base.west_diagnosis;
+                    table.reload('prescription', {
+                        url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                            id: $('#medical_id').val()
                         }
-
-                    ]
-                ],
-                data: [{
-                    "pre_name": "支气管哮喘",
-                    "state": "未开立"
-                }, {
-                    "pre_name": "支气管哮喘",
-                    "state": "未开立"
-                }, {
-                    "pre_name": "支气管哮喘",
-                    "state": "未开立"
-                }, {
-                    "pre_name": "支气管哮喘",
-                    "state": "未开立"
-                }, {
-                    "pre_name": "支气管哮喘",
-                    "state": "未开立"
-                }]
-
+                    }); //只重载数据
+                }
             });
-            table.render({
-                elem: '#prescription_item',
-                skin: 'line',
-                size: 'sm',
-                toolbar: '#prescriptionItem_toolbar',
-                text: {
-                    none: "无数据"
-                },
-                page: {
-                    limit: 3
-                },
-                cols: [
-                    [{
-                        type: 'checkbox',
-                        fixed: "left"
-                    }, {
-                        field: 'pre_name',
-                        title: '药品名称',
-                        align: 'center',
-                        width: 120,
-                        fixed: 'left'
-                    }, {
-                        field: 'format',
-                        title: '规格',
-                        width: 100,
-                        fixed: 'left'
-                    }, {
-                        field: 'price',
-                        title: '单价',
-                        width: 55,
-                        fixed: 'left'
-                    }, {
-                        field: 'use',
-                        title: '用法',
-                        width: 87,
-                        fixed: 'left'
-                    }, {
-                        field: 'dosage',
-                        title: '用量',
-                        width: 55,
-                        fixed: 'left'
-                    }, {
-                        field: 'frequency',
-                        title: '频次',
-                        width: 55,
-                        fixed: 'left'
-                    }, {
-                        field: 'num',
-                        title: '数量',
-                        width: 55,
-                        fixed: 'left'
-                    }, {
-                        field: 'operation',
-                        title: '操作',
-                        width: 80,
-                        fixed: 'left',
-                        toolbar: "#bar"
-                    }]
-                ],
-                data: [{}]
+            table.on('row(done)', function(obj) {
+                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
+                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
+                $("#record_id").val(obj.data.record_id);
+                $("#name").val(obj.data.name);
+                $("#sex").val(obj.data.sex);
+                $("#age").val(obj.data.age);
+                $("#regist_id").val(obj.data.regist_id);
+                $("#medical_id").val(obj.data.medical_id);
+                document.getElementById("west_diagnosis").value = obj.data.west_diagnosis;
+                document.getElementById("sticky_info").value = "姓名:" + obj.data.name + ";病历号:" + obj.data.record_id + ";年龄:" + obj.data.age + ";性别:" + obj.data.sex;
+                document.getElementById("sticky_diagnosis").value = "【西医诊断】" + obj.data.west_diagnosis;
+                table.reload('prescription', {
+                    url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    },
+                    where: {
+                        id: $('#medical_id').val()
+                    }
+                }); //只重载数据
 
             });
             table.render({
                 elem: '#template',
+                id: 'templateReloadTable',
+                url: 'http://localhost:8085/prescribe/initDrugsTemplateList',
                 skin: 'line',
                 size: 'sm',
+                text: {
+                    none: '无模板数据'
+                },
                 toolbar: '#template_toolbar',
                 page: {
                     limit: 3
@@ -814,6 +753,12 @@
 
                 cols: [
                     [{
+                        field: 'id',
+                        title: '模板id',
+                        width: 220,
+                        fixed: 'left',
+                        hide: true
+                    }, {
                         field: 'name',
                         title: '模板名称',
                         width: 220,
@@ -825,22 +770,41 @@
                         fixed: 'left'
                     }]
                 ],
-                data: [{
-                    'name': '春季常发性感冒',
-                    'field': '全院'
-                }, {
-                    'name': '春季常发性感冒',
-                    'field': '全院'
-                }, {
-                    'name': '春季常发性感冒',
-                    'field': '全院'
-                }, {
-                    'name': '春季常发性感冒',
-                    'field': '全院'
-                }, {
-                    'name': '春季常发性感冒',
-                    'field': '全院'
-                }]
+                data: []
+
+            });
+            //根据名称模糊查询模板
+            table.on('toolbar(template)', function(obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'template_reload':
+                        var templateReload = $('#template_input');
+                        console.log(templateReload.val());
+                        //执行重载
+                        table.reload('templateReloadTable', {
+                            url: 'http://localhost:8085/prescribe/initDrugsTemplateListByName/',
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                name: templateReload.val()
+                            }
+                        }, 'data');
+
+                        break;
+                }
+            });
+            table.on('row(template)', function(obj) {
+                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
+                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
+                var temp_id = obj.data.id;
+                $('#selected_template').val("模板：" + obj.data.name);
+                table.reload('template_item', {
+                    url: 'http://localhost:8085/prescribe/initDrugsTemplateItemListByTempId/' + temp_id,
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                }); //只重载数据
 
             });
 
@@ -848,26 +812,46 @@
                 elem: '#template_item',
                 skin: 'line',
                 size: 'sm',
+                text: {
+                    none: '该模板下无药品数据'
+                },
                 toolbar: '#templateItem_toolbar',
                 page: {
                     limit: 3
                 },
-
                 cols: [
                     [{
-                            field: 'pre_name',
-                            title: '药品名称',
+                            field: 'detail_id',
+                            title: '模板明细id',
                             width: 150,
+                            fixed: 'left',
+                            hide: true
+                        }, {
+                            field: 'drugs_id',
+                            title: '药品id',
+                            width: 150,
+                            fixed: 'left',
+                            hide: true
+                        }, {
+                            field: 'temp_id',
+                            title: '模板id',
+                            width: 150,
+                            fixed: 'left',
+                            hide: true
+                        }, {
+                            field: 'name',
+                            title: '药品名称',
+                            width: 165,
                             fixed: 'left'
                         }, {
                             field: 'format',
                             title: '药品规格',
-                            width: 150,
+                            width: 140,
                             fixed: 'left'
                         }, {
                             field: 'unit',
                             title: '单位',
-                            width: 100,
+                            width: 70,
                             fixed: 'left'
                         }, {
                             field: 'use',
@@ -877,87 +861,514 @@
                         }, {
                             field: 'dosage',
                             title: '用量',
-                            width: 95,
+                            width: 80,
                             fixed: 'left'
                         }, {
                             field: 'frequency',
                             title: '频次',
-                            width: 60,
+                            width: 100,
                             fixed: 'left'
                         }
 
                     ]
                 ],
-                data: [{
-                    'pre_name': '山药颗粒',
-                    'format': '1g/10g/1袋',
-                    'unit': '袋',
-                    'use': '1',
-                    'dosage': '1',
-                    'frequency': '1'
-                }, {
-                    'pre_name': '山药颗粒',
-                    'format': '1g/10g/1袋',
-                    'unit': '袋',
-                    'use': '1',
-                    'dosage': '1',
-                    'frequency': '1'
-                }, {
-                    'pre_name': '山药颗粒',
-                    'format': '1g/10g/1袋',
-                    'unit': '袋',
-                    'use': '1',
-                    'dosage': '1',
-                    'frequency': '1'
-                }, {
-                    'pre_name': '山药颗粒',
-                    'format': '1g/10g/1袋',
-                    'unit': '袋',
-                    'use': '1',
-                    'dosage': '1',
-                    'frequency': '1'
-                }, {
-                    'pre_name': '山药颗粒',
-                    'format': '1g/10g/1袋',
-                    'unit': '袋',
-                    'use': '1',
-                    'dosage': '1',
-                    'frequency': '1'
-                }]
+                data: []
 
             });
 
-            table.on('toolbar(prescription)', function(obj) {
-                if (obj.event == 'add_prescription') {
-                    layer.open({
-                        type: 1,
-                        content: '<input type="text" class="layui-input" style="width:328px;display:inline;margin-top:20px;margin-left:30px" placeholder="请输入处方名称">',
-                        title: '添加处方',
-                        area: ['30%', '30%'],
-                        offset: [
-                            0.35 * ($(window).height()), 0.32 * ($(window).width())
-                        ],
-                        shade: 0.5,
-                        btn: ["添加", "取消"]
+            table.on('toolbar(template_item)', function(obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'useThisTemplate':
+                        var push_data = layui.table.cache['template_item'];
+                        if (push_data.length == 0) {
+                            layer.msg("你还未选择模板！", {
+                                icon: 5,
+                                time: 1500
+                            });
+                        } else {
+                            layer.open({
+                                type: 1,
+                                title: '使用模板',
+                                closeBtn: false,
+                                area: '300px;',
+                                shade: 0.4,
+                                id: 'useThisTemplate_layer',
+                                btn: ['确认', '取消'],
+                                btnAlign: 'c',
+                                moveType: 1,
+                                content: '<div style="padding: 30px; line-height: 22px; color: #000;">确认使用此处方模板？</div>',
+                                success: function(layero) {
+                                    var btn = layero.find('.layui-layer-btn');
+
+                                    btn.find('.layui-layer-btn0').on('click', function() {
+                                        var prescription_data = {}
+                                        var field_data = [];
+                                        prescription_data.medical_id = $('#medical_id').val();
+                                        prescription_data.regist_id = $('#regist_id').val();
+                                        prescription_data.user_id = doctor_id;
+                                        prescription_data.prescription_state = 168; //处方状态：未开立
+                                        prescription_data.prescription_name = $('#selected_template').val();
+                                        for (let i = 0; i < push_data.length; i++) {
+                                            var temp = push_data[i];
+                                            field_data.push({
+                                                "drugs_id": temp.drugs_id,
+                                                "use": temp.use,
+                                                "dosage": temp.dosage,
+                                                "frequency": temp.frequency,
+                                                "amount": 1.00,
+                                                "state": 2 //处方明细状态：暂存
+                                            })
+                                        }
+                                        prescription_data.data = field_data;
+                                        console.log("处方数据:" + JSON.stringify(prescription_data));
+                                        $.ajax({
+                                            url: "http://localhost:8085/prescribe/save",
+                                            type: 'post',
+                                            data: JSON.stringify(prescription_data),
+                                            contentType: "application/json",
+                                            xhrFields: {
+                                                withCredentials: true
+                                            },
+                                            beforeSend: function() {},
+                                            success: function(data) {
+                                                if (data.code == 1) {
+                                                    layer.msg(data.msg, {
+                                                        icon: 5
+                                                    });
+                                                    return false;
+                                                } else if (data.code == 0) {
+                                                    console.log(JSON.stringify(data));
+                                                    layer.msg(data.msg, {
+                                                        icon: 6, //成功的表情
+                                                        time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                                    });
+                                                    table.reload('prescription', {
+                                                        url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                                                        page: {
+                                                            curr: 1 //重新从第 1 页开始
+                                                        },
+                                                        where: {
+                                                            id: $('#medical_id').val()
+                                                        }
+                                                    }); //只重载数据
+
+                                                    table.reload('prescription_item', {
+                                                        url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                                        page: {
+                                                            curr: 1 //重新从第 1 页开始
+                                                        },
+                                                        where: {
+                                                            id: data.data
+                                                        }
+                                                    }); //只重载数据
+
+                                                }
+                                            }
+                                        })
+                                    })
+                                }
+                            });
+                        }
+                        break;
+                }
+            });
+
+            let prescription_selected_id = '';
+            table.render({
+                elem: '#prescription',
+                skin: 'line',
+                size: 'sm',
+                text: {
+                    none: '暂无处方'
+                },
+                page: {
+                    limit: 3
+                },
+                toolbar: '#prescription_toolbar',
+                cols: [
+                    [{
+                            type: 'radio',
+                            fixed: "left"
+                        }, {
+                            field: 'id',
+                            title: '模板id',
+                            width: 111,
+                            align: 'center',
+                            fixed: 'left',
+                            hide: true
+                        }, {
+                            field: 'name',
+                            title: '模板名称',
+                            width: 111,
+                            align: 'center',
+                            fixed: 'left'
+                        }, {
+                            field: 'state',
+                            title: '状态',
+                            width: 70,
+                            fixed: 'left'
+                        }, {
+                            field: 'operation',
+                            title: '操作',
+                            width: 70,
+                            fixed: 'left',
+                            toolbar: "#bar",
+
+                        }
+
+                    ]
+                ],
+                data: [],
+                done: function(res, curr, count) {
+                    console.log('id变化：' + prescription_selected_id);
+                    if (prescription_selected_id == '') {
+                        $.each(res.data, function(idx, val) {
+                            // 根据用户id回显
+                            if (idx == 0) {
+                                val["LAY_CHECKED"] = 'true';
+                                //找到对应数据改变勾选样式，呈现出选中效果
+                                let index = val['LAY_TABLE_INDEX'];
+                                $('tr[data-index=' + index + '] input[type="radio"]').click();
+                                prescription_selected_id = val.id;
+                                table.reload('prescription_item', {
+                                    url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    },
+                                    where: {
+                                        id: val.id
+                                    }
+                                }); //只重载数据
+                                form.render('radio'); //刷新radio选择框渲染
+                            }
+                        });
+                    } else {
+                        $.each(res.data, function(idx, val) {
+                            // 根据用户id回显
+                            if (val.id == prescription_selected_id) {
+                                val["LAY_CHECKED"] = 'true';
+                                //找到对应数据改变勾选样式，呈现出选中效果
+                                let index = val['LAY_TABLE_INDEX'];
+                                $('tr[data-index=' + index + '] input[type="radio"]').click();
+
+                                table.reload('prescription_item', {
+                                    url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    },
+                                    where: {
+                                        id: prescription_selected_id
+                                    }
+                                }); //只重载数据
+                                form.render('radio'); //刷新radio选择框渲染
+                            }
+                        });
+                    }
+                }
+            });
+            table.on('tool(prescription)', function(obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+                    layer.confirm('确认删除该处方么？', {
+                        skin: 'layer-ext-myskin',
+                        btn: ['删除', '取消']
+                    }, function(index) {
+                        if (obj.data.id == prescription_selected_id) {
+                            prescription_selected_id = '';
+                        }
+                        $.ajax({
+                            url: "http://localhost:8085/prescribe/deletePrescription/" + obj.data.id,
+                            type: 'get',
+                            contentType: "application/json",
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            beforeSend: function() {},
+                            success: function(data) {
+                                if (data.code == 1) {
+                                    layer.msg(data.msg, {
+                                        icon: 5
+                                    });
+                                    return false;
+                                } else if (data.code == 0) {
+                                    layer.msg(data.msg, {
+                                        icon: 6, //成功的表情
+                                        time: 700 //关闭（如果不配置，默认是3秒）
+                                    });
+                                    table.reload('prescription', {
+                                        url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        },
+                                        where: {
+                                            id: $('#medical_id').val()
+                                        }
+                                    }); //只重载数据
+
+                                    table.reload('prescription_item', {
+                                        url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        },
+                                        where: {
+                                            id: obj.data.id
+                                        }
+                                    }); //只重载数据
+
+                                }
+                            }
+                        })
+                        layer.close(index);
+
                     });
+                }
+            });
+            table.on('tool(prescription_item)', function(obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+
+                    layer.confirm('确认删除药品[' + obj.data.name + ']么？', {
+                        skin: 'layer-ext-myskin',
+                        btn: ['删除', '取消']
+                    }, function(index) {
+                        $.ajax({
+                            url: "http://localhost:8085/prescribe/deletePrescriptionItem/" + obj.data.id,
+                            type: 'get',
+                            contentType: "application/json",
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            beforeSend: function() {},
+                            success: function(data) {
+                                if (data.code == 1) {
+                                    layer.msg(data.msg, {
+                                        icon: 5
+                                    });
+                                    return false;
+                                } else if (data.code == 0) {
+                                    layer.msg(data.msg, {
+                                        icon: 6, //成功的表情
+                                        time: 700 //关闭（如果不配置，默认是3秒）
+                                    });
+                                    table.reload('prescription_item', {
+                                        url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        },
+                                        where: {
+                                            id: obj.data.p_id
+                                        }
+                                    }); //只重载数据
+
+                                }
+                            }
+                        })
+                        layer.close(index);
+
+                    });
+                }
+            });
+            table.on('radio(prescription)', function(obj) {
+                if (obj.checked == true) {
+                    prescription_selected_id = obj.data.id;
+                } else {
+                    prescription_selected_id = '';
+                }
+                table.reload('prescription_item', {
+                    url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    },
+                    where: {
+                        id: obj.data.id
+                    }
+                }); //只重载数据
+
+
+            });
+            table.render({
+                elem: '#prescription_item',
+                id: 'prescription_item',
+                skin: 'line',
+                size: 'sm',
+                toolbar: '#prescriptionItem_toolbar',
+                text: {
+                    none: "暂无处方明细数据"
+                },
+                page: {
+                    limit: 3
+                },
+                cols: [
+                    [{
+                        type: 'checkbox',
+                    }, {
+                        field: 'id',
+                        title: '处方明细id',
+                        align: 'center',
+                        width: 140,
+                        hide: true
+                    }, {
+                        field: 'p_id',
+                        title: '处方id',
+                        align: 'center',
+                        width: 140,
+                        hide: true
+                    }, , {
+                        field: 'drugs_id',
+                        title: '药品id',
+                        align: 'center',
+                        width: 140,
+                        hide: true
+                    }, {
+                        field: 'name',
+                        title: '药品名称',
+                        align: 'center',
+                        width: 140,
+                    }, {
+                        field: 'format',
+                        title: '药品规格',
+                        width: 100,
+                    }, {
+                        field: 'price',
+                        title: '单价',
+                        width: 65,
+                    }, {
+                        field: 'use',
+                        title: '用法',
+                        width: 60,
+                    }, {
+                        field: 'dosage',
+                        title: '用量',
+                        width: 60,
+                    }, {
+                        field: 'frequency',
+                        title: '频次',
+                        width: 60,
+                    }, {
+                        field: 'num',
+                        title: '数量',
+                        width: 55,
+                    }, {
+                        field: 'operation',
+                        title: '操作',
+                        width: 70,
+                        toolbar: "#bar"
+                    }]
+                ],
+                data: [],
+                done: function(res, curr) {
+                    $.ajax({
+                        url: "http://localhost:8085/prescribe/calculateTotalPrice/" + prescription_selected_id,
+                        type: 'get',
+                        contentType: "application/json",
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        beforeSend: function() {},
+                        success: function(data) {
+                            if (data.code == 1) {
+                                layer.msg(data.msg, {
+                                    icon: 5
+                                });
+                                return false;
+                            } else if (data.code == 0) {
+                                $('#total_price').val(data.data + '元');
+                            }
+                        }
+                    })
 
                 }
             });
 
 
-            table.on('toolbar(prescription_item)', function(obj) {
-                if (obj.event == 'add_medicine') {
-                    layer.open({
-                        type: 2,
-                        content: 'medicineAdd.html',
-                        title: '添加药品',
-                        area: ['85%', '80%'],
-                        offset: [
-                            0.1 * ($(window).height()), 0.07 * ($(window).width())
-                        ],
-                        shade: 0.5,
-                        btn: ["添加", "取消"]
+            table.on('toolbar(prescription)', function(obj) {
+                if (obj.event == 'add_prescription') {
+                    layer.prompt({
+                        title: '新增处方'
+                    }, function(val, index) {
+                        layer.close(index);
+                        var prescription_data = {}
+                        var field_data = [];
+                        prescription_data.medical_id = $('#medical_id').val();
+                        prescription_data.regist_id = $('#regist_id').val();
+                        prescription_data.user_id = doctor_id;
+                        prescription_data.prescription_state = 168; //处方状态：暂存
+                        prescription_data.prescription_name = "新增：" + val;
+                        $.ajax({
+                            url: "http://localhost:8085/prescribe/savePrescription",
+                            type: 'post',
+                            data: JSON.stringify(prescription_data),
+                            contentType: "application/json",
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            beforeSend: function() {},
+                            success: function(data) {
+                                if (data.code == 1) {
+                                    layer.msg(data.msg, {
+                                        icon: 5
+                                    });
+                                    return false;
+                                } else if (data.code == 0) {
+                                    console.log(JSON.stringify(data));
+                                    layer.msg(val + "处方新增成功！", {
+                                        icon: 6, //成功的表情
+                                        time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                    });
+                                    table.reload('prescription', {
+                                        url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        },
+                                        where: {
+                                            id: $('#medical_id').val()
+                                        }
+                                    }); //只重载数据
+
+                                }
+                            }
+                        })
                     });
+
+                }
+            });
+            // $('#total_price').on('click', function() {
+            //     var total_price = 0.00;
+            //     var datas = layui.table.cache['prescription_item'];
+            //     for (let i = 0; i < datas.length; i++) {
+            //         total_price += datas[i].price * datas[i].num;
+            //     }
+            //     console.log(total_price);
+            //     $('#total_price').val(total_price + '元');
+            // })
+            table.on('toolbar(prescription_item)', function(obj) {
+
+                if (obj.event == 'add_medicine') {
+                    if (prescription_selected_id == '') {
+                        layer.msg('您还未选择处方，无法添加药品！', {
+                            icon: 5,
+                            time: 1500
+                        })
+                    } else {
+
+                        layer.open({
+                            type: 2,
+                            content: 'medicineAdd.html',
+                            title: false,
+                            // scrollbar: false,
+                            area: ['70%', '88%'],
+                            offset: [
+                                0.06 * ($(window).height()), 0.1 * ($(window).width())
+                            ],
+                            shade: 0.5,
+                            success: function(layero, index) {
+                                var iframe = window['layui-layer-iframe' + index];
+                                iframe.child(prescription_selected_id);
+                            }
+                        });
+
+                    }
 
                 }
             });
@@ -992,27 +1403,6 @@
                 };
 
             });
-            len = layui.table.cache["done"].length;
-            base = layui.table.cache["done"][0];
-            document.getElementById("record_id").value = base.record_id;
-            document.getElementById("name").value = base.name;
-            document.getElementById("sex").value = base.sex;
-            document.getElementById("age").value = base.age;
-            document.getElementById("sticky_info").value = "姓名:" + base.name + ";病历号:" + base.record_id + ";年龄:" + base.age + ";性别:" + base.sex;
-            document.getElementById("sticky_diagnosis").value = "【西医诊断】" + base.west_diagnosis;
-            document.getElementById("west_diagnosis").value = base.west_diagnosis;
-            table.on('row(done)', function(obj) {
-                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
-                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
-                document.getElementById("record_id").value = obj.data.record_id;
-                document.getElementById("name").value = obj.data.name;
-                document.getElementById("sex").value = obj.data.sex;
-                document.getElementById("age").value = obj.data.age;
-                document.getElementById("west_diagnosis").value = obj.data.west_diagnosis;
-                document.getElementById("sticky_info").value = "姓名:" + obj.data.name + ";病历号:" + obj.data.record_id + ";年龄:" + obj.data.age + ";性别:" + obj.data.sex;
-                document.getElementById("sticky_diagnosis").value = "【西医诊断】" + obj.data.west_diagnosis;
-                return false;
-            });
 
             form.verify({
                 content: function(value) {
@@ -1021,16 +1411,148 @@
             });
 
             form.on('submit(do_prescribe)', function(data) {
-                layer.alert(JSON.stringify(data.field), {
-                    title: '最终的提交信息',
-                    offset: [
-                        0.1 * $(window).height(),
-                        0.35 * $(window).width()
-                    ]
-                });
+                var prescription_table = layui.table.cache['prescription'];
+                var prescriptionItem_table = layui.table.cache['prescription_item'];
+                if (prescription_table[0] === undefined || prescription_table[0].name === undefined || prescriptionItem_table[0] === undefined || prescriptionItem_table[0].name === undefined) {
+                    layer.alert('未添加处方或药品！', {
+                        title: '开立失败',
+                        icon: 5
+                    })
+                } else {
+                    layer.open({
+                        type: 1,
+                        title: '提交处方单',
+                        closeBtn: false,
+                        area: '300px;',
+                        shade: 0.4,
+                        id: 'prescribe_layer',
+                        btn: ['确认提交', '取消'],
+                        btnAlign: 'c',
+                        moveType: 1,
+                        content: '<div style="padding: 30px; line-height: 22px; color: #000;">确认提交此处方单？</div>',
+                        success: function(layero) {
+                            var btn = layero.find('.layui-layer-btn');
+                            btn.find('.layui-layer-btn0').on('click', function() {
+                                data.field.dept_id = dept_id;
+                                data.field.create_oper_id = doctor_id;
+                                data.field.item_type = "2";
+
+                                $.ajax({
+                                    url: "http://localhost:8085/prescribe/submit",
+                                    type: 'post',
+                                    contentType: "application/json",
+                                    data: JSON.stringify(data.field),
+                                    xhrFields: {
+                                        withCredentials: true
+                                    },
+                                    beforeSend: function() {},
+                                    success: function(data) {
+                                        if (data.code == 1) {
+                                            layer.msg(data.msg, {
+                                                icon: 5
+                                            });
+
+                                            return false;
+                                        } else if (data.code == 0) {
+                                            layer.msg(data.msg, {
+                                                icon: 6, //成功的表情
+                                                time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                            });
+                                            $('.list_refresh').click();
+                                            table.reload('prescription', {
+                                                url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                                                page: {
+                                                    curr: 1 //重新从第 1 页开始
+                                                },
+                                                where: {
+                                                    id: $('#medical_id').val()
+                                                }
+                                            }); //只重载数据
+
+                                        }
+                                    }
+                                })
+                            })
+                        }
+                    });
+                }
+
+
+
                 return false;
             });
+            form.on('submit(cancel)', function(data) {
+                var prescription_table = layui.table.cache['prescription'];
+                if (prescription_table[0] === undefined || prescription_table[0].name === undefined) {
+                    layer.alert('错误操作！', {
+                        title: '作废失败',
+                        icon: 5
+                    })
+                } else {
+                    layer.open({
+                        type: 1,
+                        skin: 'layer-ext-myskin',
+                        title: '作废处方单',
+                        closeBtn: false,
+                        area: '300px;',
+                        shade: 0.4,
+                        id: 'cancel_layer',
+                        btn: ['确认作废', '取消'],
+                        btnAlign: 'c',
+                        moveType: 1,
+                        content: '<div style="padding: 30px; line-height: 22px; color: #000;">确认作废此处方单？</div>',
+                        success: function(layero) {
+                            var btn = layero.find('.layui-layer-btn');
+                            btn.find('.layui-layer-btn0').css('background-color', '#ff5722');
+                            btn.find('.layui-layer-btn0').css('border', 'none');
+                            btn.find('.layui-layer-btn0').css('color', '#fff');
+                            btn.find('.layui-layer-btn0').on('click', function() {
+                                data.field.dept_id = dept_id;
+                                data.field.create_oper_id = doctor_id;
+                                data.field.item_type = "2";
+                                $.ajax({
+                                    url: "http://localhost:8085/prescribe/cancel",
+                                    type: 'post',
+                                    contentType: "application/json",
+                                    data: JSON.stringify(data.field),
+                                    xhrFields: {
+                                        withCredentials: true
+                                    },
+                                    beforeSend: function() {},
+                                    success: function(data) {
+                                        if (data.code == 1) {
+                                            layer.msg(data.msg, {
+                                                icon: 5
+                                            });
+                                            return false;
+                                        } else if (data.code == 0) {
+                                            layer.msg(data.msg, {
+                                                icon: 6, //成功的表情
+                                                time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                            });
+                                            $('.list_refresh').click();
+                                            table.reload('prescription', {
+                                                url: 'http://localhost:8085/prescribe/initPrescriptionList',
+                                                page: {
+                                                    curr: 1 //重新从第 1 页开始
+                                                },
+                                                where: {
+                                                    id: $('#medical_id').val()
+                                                }
+                                            }); //只重载数据
 
+                                        }
+                                    }
+                                })
+                            })
+                        }
+                    });
+                }
+
+
+
+                return false;
+            });
         });
     </script>
 

@@ -95,20 +95,36 @@
 </head>
 
 <body>
-    <div class="layui-form-item" style="width: 600px;margin: auto;margin-top: 20px;">
-        <table id="west_diagnosis" lay-filter="west_diagnosis"></table>
-    </div>
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-form-item" style="width: 600px;margin: auto;margin-top: 20px;">
+                <table class="layui-hide" id="west_diagnosis" lay-filter="west_diagnosis"></table>
+            </div>
+            <script type="text/html" id="westDiagnosis_toolbar">
+                <div class="toolbar_title">名称：</div>
+                <input type="text" class="layui-input" style="display: inline;height:25px;width:150px;font-size:12px" placeholder="请输入模板名称" name="id" id="demoReload" autocomplete="off">
+                <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;width:60px" data-type="reload" id="search" lay-event="reload">查询</button>
+                <div class="toolbar_title" style="margin-left:40px">发病日期：</div>
+                <input type="text" class="layui-input" lay-verify="required|time" name="time" style="display: inline;height:25px;width:200px;font-size:12px" placeholder="发病日期" id="time" autocomplete="off">
 
-    <script type="text/html" id="westDiagnosis_toolbar">
-        <div class="toolbar_title">名称：</div>
-        <input type="text" class="layui-input" style="display: inline;height:25px;width:150px;font-size:12px" placeholder="请输入模板名称">
-        <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;width:60px">查询</button>
-        <div class="toolbar_title" style="margin-left:40px">发病日期：</div>
-        <input type="text" class="layui-input" style="display: inline;height:25px;width:200px;font-size:12px" placeholder="发病日期" id="time" autocomplete="off">
+            </script>
+        </div>
+        <div class="layui-form-item layui-hide">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit" value="确认添加">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit" value="确认编辑">
+            <input type="text" id="info">
+        </div>
+    </form>
 
-    </script>
 
     <script src="layui/layui.js"></script>
+    <script src="jquery/jquery.min.js"></script>
+
+    <script>
+        function child(data) {
+            $("#info").val(data);
+        }
+    </script>
     <script>
         layui.use(['form', 'layedit', 'element', 'table', 'laydate'], function() {
             var form = layui.form,
@@ -118,18 +134,17 @@
                 table = layui.table,
                 $ = layui.jquery,
                 laydate = layui.laydate;
-            table.on('tool(demo)', function(obj) {
-                var data = obj.data;
-                if (obj.event === 'del') {
-                    layer.confirm('真的删除行么', function(index) {
-                        obj.del();
-                        layer.close(index);
-                    });
-                }
-            });
-            table.render({
+            // 设置全局变量以保存选中行信息
+            let ids = new Array();
+            let datas = new Array();
+            // 保存当前页全部数据id，点击全选时使用
+            let tableIds = new Array();
+            let tableDatas = new Array();
+            var west = table.render({
                 elem: '#west_diagnosis',
                 skin: 'line',
+                url: 'http://localhost:8085/diagnose/initWestDiagnosisList',
+                id: 'testReload',
                 page: {
                     limit: 6,
                     limits: [6]
@@ -140,68 +155,151 @@
                     [{
                             type: 'checkbox',
                             fixed: "left"
-                        },
-
-                        {
+                        }, {
+                            field: 'id',
+                            title: '序号',
+                            align: 'left',
+                            width: 100,
+                            fixed: 'left'
+                        }, {
                             field: 'ICD',
                             title: 'ICD编码',
-                            align: 'center',
-                            width: 250,
+                            align: 'left',
+                            width: 120,
+                            fixed: 'left'
+                        }, {
+                            field: 'code',
+                            title: '拼音编码',
+                            align: 'left',
+                            width: 140,
                             fixed: 'left'
                         }, {
                             field: 'description',
                             title: '名称',
-                            align: 'center',
-                            width: 298,
+                            align: 'left',
+                            width: 189,
                             fixed: 'left'
                         }
 
                     ]
                 ],
-                data: [{
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }, {
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎'
-                }]
+                done: function(res) {
+                    // 设置当前页全部数据id到全局变量
+                    tableIds = res.data.map(function(value) {
+                        return value.id;
+                    });
+                    tableDatas = res.data.map(function(value) {
+                        return value;
+                    });
+                    // 设置当前页选中项
+                    $.each(res.data, function(idx, val) {
+                        if (ids.indexOf(val.id) > -1) {
+                            val["LAY_CHECKED"] = 'true';
+                            //找到对应数据改变勾选样式，呈现出选中效果
+                            let index = val['LAY_TABLE_INDEX'];
+                            $('tr[data-index=' + index + '] input[type="checkbox"]').click();
+                            form.render('checkbox'); //刷新checkbox选择框渲染
+                        }
+                    });
+                    // 获取表格勾选状态，全选中时设置全选框选中
+                    let checkStatus = table.checkStatus('west_diagnosis');
+                    if (checkStatus.isAll) {
+                        $('.layui-table-header th[data-field="0"] input[type="checkbox"]').prop('checked', true);
+                        form.render('checkbox'); //刷新checkbox选择框渲染
+                    }
+                }
+
 
             });
+            table.on('checkbox(west_diagnosis)', function(obj) {
+                if (obj.checked == true) {
+                    if (obj.type == 'one') {
+                        ids.push(obj.data.id);
+                        datas.push(obj.data);
+                    } else {
+                        for (let i = 0; i < tableIds.length; i++) {
+                            //当全选之前选中了部分行进行判断，避免重复
+                            if (ids.indexOf(tableIds[i]) == -1) {
+                                ids.push(tableIds[i]);
+                                datas.push(tableDatas[i]);
+                            }
+                        }
+                    }
+                } else {
+                    if (obj.type == 'one') {
+                        let i = ids.length;
+                        while (i--) {
+                            if (ids[i] == obj.data.id) {
+                                ids.splice(i, 1);
+                                datas.splice(i, 1);
+                            }
+                        }
+                    } else {
+                        let i = ids.length;
+                        while (i--) {
+                            if (tableIds.indexOf(ids[i]) != -1) {
+                                ids.splice(i, 1);
+                                datas.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+            });
+            //根据名称模糊查询西医诊断
+            table.on('toolbar(west_diagnosis)', function(obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'reload':
+                        var demoReload = $('#demoReload');
+                        //执行重载
+                        table.reload('testReload', {
+                            url: 'http://localhost:8085/diagnose/initWestDiagnosisListByName/',
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                name: demoReload.val()
+                                    //TODO
+                            }
+                        }, 'data');
+
+                        break;
+                }
+            });
+
             //执行一个laydate实例
             laydate.render({
                 elem: '#time',
                 type: 'datetime',
-                theme: '#1f9fff'
+                theme: '#1f9fff',
+                max: 0
+            });
+
+
+            form.on('submit(layuiadmin-app-form-submit)', function(data) {
+                var time = $('#time').val();
+                var checkStatus = table.checkStatus('testReload'); //idTest 即为基础参数 id 对应的值
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                console.log("ids" + ids);
+
+                var diagnose_data = [];
+                if ($('#info').val() != "") {
+                    var init = $("#info").val();
+                    diagnose_data = JSON.parse(init);
+                }
+                for (let i = 0; i < datas.length; i++) {
+                    var data = datas[i];
+                    diagnose_data.push({
+                        "id": data.id,
+                        "ICD": data.ICD,
+                        "description": data.description,
+                        "time": time
+                    })
+                }
+                console.log("弹窗发送数据：" + JSON.stringify(diagnose_data));
+                parent.$('#diagnosis_content').val(JSON.stringify(diagnose_data));
+                parent.layer.close(index); //再执行关闭
+                return false;
             });
         });
     </script>

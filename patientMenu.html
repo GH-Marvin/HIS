@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
 
 <head>
     <meta charset="utf-8">
@@ -53,7 +53,8 @@
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
                     <a href="javascript:;">
-                        <i class="layui-icon layui-icon-user"></i> 挂号员
+                        <i class="layui-icon layui-icon-service" style="font-weight: 600;"></i>
+                        <cite class="realname" id="realname" style="font-weight: 600;">123</cite>
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="">基本资料</a></dd>
@@ -85,7 +86,6 @@
                             <dl class="layui-nav-child">
                                 <dd><a class="site-demo-active" href="javascript:;" data-id="11" data-title="现场挂号" data-url="register" data-type="tabAdd">现场挂号</a></dd>
                                 <dd><a class="site-demo-active" href="javascript:;" data-id="12" data-title="退号" data-url="backRegister" data-type="tabAdd">退号</a></dd>
-                                <dd><a href="javascript:;">其他*</a></dd>
 
                             </dl>
                         </li>
@@ -96,9 +96,19 @@
                             </a>
                             <dl class="layui-nav-child">
                                 <dd><a class="site-demo-active" href="javascript:;" data-id="21" data-title="收费" data-url="pay" data-type="tabAdd">收费</a></dd>
-                                <dd><a href="javascript:;">退费</a></dd>
-                                <dd><a href="javascript:;">费用查询</a></dd>
-                                <dd><a href="javascript:;">其他*</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="22" data-title="退费" data-url="backPay" data-type="tabAdd">退费</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="23" data-title="查询费用" data-url="searchPay" data-type="tabAdd">费用查询</a></dd>
+                            </dl>
+                        </li>
+                        <li class="layui-nav-item layui-nav-itemed">
+                            <a href="javascript:;">
+                                <i class="layui-icon layui-icon-home"></i>
+                                <cite>药房</cite>
+                            </a>
+                            <dl class="layui-nav-child">
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="41" data-title="门诊发药" data-url="medicineOut" data-type="tabAdd">门诊发药</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="42" data-title="门诊退药" data-url="backMedicine" data-type="tabAdd">门诊退药</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="43" data-title="药品管理" data-url="medicineManage" data-type="tabAdd">药品管理</a></dd>
                             </dl>
                         </li>
                         <li class="layui-nav-item layui-nav-itemed">
@@ -107,11 +117,12 @@
                                 <cite>发票</cite>
                             </a>
                             <dl class="layui-nav-child">
-                                <dd><a href="javascript:;">发票补打</a></dd>
-                                <dd><a href="javascript:;">发票重打</a></dd>
-                                <dd><a href="javascript:;">其他*</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="31" data-title="发票补打" data-url="invoicePlay" data-type="tabAdd">发票补打</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="32" data-title="发票重打" data-url="invoiceRetype" data-type="tabAdd">发票重打</a></dd>
+                                <dd><a class="site-demo-active" href="javascript:;" data-id="33" data-title="收费员日结" data-url="cashierDaily" data-type="tabAdd">收费员日结</a></dd>
                             </dl>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -136,10 +147,18 @@
     </div>
     <script src="layui/layui.js"></script>
     <script src="jquery/jquery.min.js"></script>
-
+    <script src="jquery/jquery.cookie.js"></script>
     <script>
         //JavaScript代码区域
+        $().ready(function() {
 
+            var mydiv = document.getElementById("realname");
+            mydiv.innerHTML = $.cookie("realname_cookie");
+            if (mydiv.innerHTML === 'undefined') {
+                window.location.href = 'return.html';
+            }
+
+        });
         layui.use(['form', 'layedit', 'laydate', 'element'], function() {
             var form = layui.form,
                 layer = layui.layer,
@@ -153,13 +172,14 @@
 
 
             $(".layui-body").css("bottom", 0);
+
             var active = {
                 //在这里给active绑定几项事件，后面可通过active调用这些事件
                 tabAdd: function(url, id, name) {
                     //新增一个Tab项 传入三个参数，分别对应其标题，tab页面的地址，还有一个规定的id，是标签中data-id的属性值
                     element.tabAdd('demo', {
                         title: name,
-                        content: '<iframe id="iframe" data-frameid="' + id + '"  frameborder="0" src="' + url + '.html"  style="width:100%;height:100%;overflow:auto;"  ></iframe>',
+                        content: '<iframe id="iframe" data-frameid="' + id + '"  frameborder="0" src="' + url + '.html"  style="width:90%;height:100%;overflow:auto;"  ></iframe>',
                         id: id //规定好的id
                     })
 
@@ -176,8 +196,8 @@
                 }
             };
             $(document).ready(function() {
-                active.tabAdd("pay", "21", "收费")
-                active.tabChange("21");
+                active.tabAdd("register", "11", "挂号")
+                active.tabChange("11");
             });
 
             //当点击有site-demo-active属性的标签时，即左侧菜单栏中内容 ，触发点击事件

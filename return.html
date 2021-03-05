@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>error</title>
+</head>
+<script type="text/javascript">
+    var lefttime = 5000;
+
+    function go() {
+        document.getElementById("w").innerText = (lefttime) / 1000;
+        lefttime = lefttime - 1000;
+        if (lefttime < 0) {
+            document.location.href = "login.html" //重定向方法
+        }
+    }
+    setInterval(go, 1000);
+</script>
+
+<body>
+    <div>未授权的页面！</div>
+    <div>
+        <div id="w">5</div>秒后自动跳转至登录页面</div>
+	<div>
+		<img src="images/401.jpg" height="100%" width="100%"/>
+	</div>
+</body>
+
+</html>

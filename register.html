@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
 
 <head>
     <meta charset="utf-8">
@@ -137,7 +137,7 @@
     </div>
     <!-- 表单 -->
     <form class="layui-form layui-form-pane" action="" lay-filter="register_form">
-        <div class="form w">
+        <div class="form w" style="width: 750px;">
             <!-- 页眉 -->
             <div class="page_header">
                 <div class="left_pageHeader">Neuedu</div>
@@ -163,7 +163,10 @@
                             <input lay-verify="required|record_id" type="text" style="border-color: #1e9fff" id="record_id" name="record_id" autocomplete="off" class="layui-input">
                         </div>
                         <div class="layui-inline">
-                            <button class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-search"></i>查询</button>
+                            <button type="button" class="layui-btn layui-btn-normal" id="patient_search"><i class="layui-icon layui-icon-search"></i>查询</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-disabled" id="patient_refresh" disabled><i class="layui-icon layui-icon-refresh"></i>重置</button>
                         </div>
                     </div>
                 </div>
@@ -176,13 +179,13 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">姓名</label>
                         <div class="layui-input-inline">
-                            <input lay-verify="required|name" type="text" id="name" name="name" autocomplete="off" class="layui-input">
+                            <input lay-verify="required|name" type="text" id="name" name="name" autocomplete="off" class="layui-input" placeholder="请输入姓名">
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">年龄</label>
                         <div class="layui-input-inline">
-                            <input lay-verify="required|age" type="text" id="age" name="age" autocomplete="off" class="layui-input">
+                            <input lay-verify="required|age" type="text" id="age" name="age" autocomplete="off" class="layui-input" placeholder="请输入年龄（岁）">
                         </div>
                     </div>
                 </div>
@@ -191,10 +194,7 @@
                         <label class="layui-form-label">性别</label>
                         <div class="layui-input-inline">
                             <select lay-verify="required|sex" name="sex" id="sex" lay-filter="sex">
-                            <option value="">请选择性别</option>
-                            <option value="0">男</option>
-                            <option value="1">女</option>
-                        </select>
+                            </select>
                         </div>
                     </div>
                     <div class="layui-inline">
@@ -207,14 +207,14 @@
                 <div class="layui-form-item" style="width: 620px;">
                     <label class="layui-form-label">身份证号</label>
                     <div class="layui-input-block">
-                        <input lay-verify="required|identity_id" type="text" id="identity_id" name="identity_id" autocomplete="off" class="layui-input">
+                        <input lay-verify="required|identity_id" type="text" id="identity_id" name="identity_id" autocomplete="off" class="layui-input" placeholder="请输入身份证号">
                     </div>
                 </div>
 
                 <div class="layui-form-item" style="width: 620px;">
                     <label class="layui-form-label">家庭住址</label>
                     <div class="layui-input-block">
-                        <input lay-verify="required|address" type="text" id="address" name="address" autocomplete="off" class="layui-input">
+                        <input lay-verify="required|address" type="text" id="address" name="address" autocomplete="off" class="layui-input" placeholder="请输入家庭住址">
                     </div>
                 </div>
 
@@ -227,7 +227,7 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">看诊日期</label>
                         <div class="layui-input-inline">
-                            <input lay-verify="required|visit_date" type="text" class="layui-input" id="visit_date" name="visit_date" id="visit_date" placeholder="yyyy-MM-dd">
+                            <input lay-verify="required|visit_date" type="text" autocomplete="off" class="layui-input" id="visit_date" name="visit_date" id="visit_date" placeholder="yyyy-MM-dd">
                         </div>
                     </div>
                     <div class="layui-inline">
@@ -245,22 +245,15 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">挂号科室</label>
                         <div class="layui-input-inline">
-                            <select lay-verify="required|department" name="department" id="department" lay-filter="department">
-                                    <option value="">请选择科室</option>
-                                    <option value="0">心血管内科</option>
-                                    <option value="1">皮肤科</option>
-                                    <option value="2">耳鼻喉科</option>
-                                </select>
+                            <select lay-verify="required|department" name="department" id="department" lay-filter="department" lay-search>
+                            </select>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">挂号级别</label>
                         <div class="layui-input-inline">
                             <select lay-verify="required|registLevel" name="registLevel" id="registLevel" lay-filter="registLevel">
-                                    <option value="">请选择号别</option>
-                                    <option value="0">普通号 | 10.00￥</option>
-                                    <option value="1">专家号 | 50.00￥</option>
-                                </select>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -269,11 +262,7 @@
                         <label class="layui-form-label">看诊医生</label>
                         <div class="layui-input-inline">
                             <select lay-verify="required|doctor" name="doctor" id="doctor" lay-filter="doctor">
-                                    <option value="">请选择医生</option>
-                                    <option value="0">华佗</option>
-                                    <option value="1">霍去病</option>
-                                    <option value="2">张仲景</option>
-                                </select>
+                            </select>
                         </div>
                     </div>
                     <div class="layui-inline">
@@ -295,11 +284,17 @@
                         <div class="layui-input-inline">
                             <select lay-verify="required|payType" name="payType" id="payType" lay-filter="payType">
                                     <option value="">请选择支付方式</option>
-                                    <option value="1">现金</option>
-                                    <option value="2">支付宝</option>
-                                    <option value="3">银行卡</option>
+                                
                                 </select>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" hidden>
+                <div class="layui-inline">
+                    <label class="layui-form-label">挂号员id</label>
+                    <div class="layui-input-inline">
+                        <input type="text" lay-verify="required|payType" name="registerId" id="registerId" lay-filter="registerId" value="0" autocomplete="off" class="layui-input" disabled="">
                     </div>
                 </div>
             </div>
@@ -319,8 +314,14 @@
         </div>
     </form>
     <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="jquery/jquery.min.js" charset="utf-8"></script>
+    <script src="jquery/jquery.cookie.js"></script>
 
     <script>
+        var caseNum = "";
+        $().ready(function() {
+            $("#registerId").val($.cookie("registerId_cookie"));
+        });
         layui.use(['form', 'layedit', 'laydate', 'element'], function() {
             var form = layui.form,
                 layer = layui.layer,
@@ -328,6 +329,155 @@
                 laydate = layui.laydate,
                 element = layui.element,
                 $ = layui.jquery;
+            $.ajax({
+                url: "http://localhost:8085/register/initConstant",
+                type: 'get',
+                contentType: "application/json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                beforeSend: function() {},
+                success: function(data) {
+                    if (data.code == 1) {
+                        layer.msg(data.msg, {
+                            icon: 5
+                        });
+                        return false;
+                    } else if (data.code == 0) {
+                        //初始化病历号
+                        $('#record_id').val(data.data.caseNumber[0].name);
+                        caseNum = data.data.caseNumber[0].name;
+                        //初始化号别下拉
+                        $('#registLevel').empty();
+                        $('#registLevel').append(new Option("请选择挂号级别", ''));
+                        $.each(data.data.registLevel, function(index, item) {
+                            $('#registLevel').append(new Option(item.name, item.id)); //往下拉菜单里添加元素
+                        });
+                        //初始化性别下拉框
+                        $('#sex').empty();
+                        $('#sex').append(new Option("请选择性别", ''));
+                        $.each(data.data.gender, function(index, item) {
+                            $('#sex').append(new Option(item.name, item.id));
+                        });
+                        //初始化科室下拉框
+                        $('#department').empty();
+                        $('#department').append(new Option("请选择挂号科室", ''));
+                        $.each(data.data.dept, function(index, item) {
+                            $('#department').append(new Option(item.name, item.id));
+                        });
+                        //初始化科室下拉框
+                        $('#payType').empty();
+                        $('#payType').append(new Option("请选择支付方式", ''));
+                        $.each(data.data.pay, function(index, item) {
+                            $('#payType').append(new Option(item.name, item.id));
+                        });
+                        form.render();
+                    }
+                }
+            });
+
+            layui.$('#patient_search').on('click', function() {
+                var record_id = $('#record_id').val();
+                var url = "http://localhost:8085/register/findById/" + record_id;
+                caseNum = "";
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    contentType: "application/json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    beforeSend: function() {},
+                    success: function(data) {
+                        $('#patient_refresh').removeClass('layui-btn-disabled');
+                        $('#patient_refresh').addClass('layui-btn-danger');
+                        $('#patient_refresh').attr('disabled', false);
+                        if (data.code == 1) {
+                            layer.msg(data.msg, {
+                                icon: 5,
+                                time: 1000
+                            });
+                            return false;
+                        } else if (data.code == 0) {
+                            layer.msg(data.msg, {
+                                icon: 6, //成功的表情
+                                time: 500 //1秒关闭（如果不配置，默认是3秒）
+                            }, function() {
+                                form.val('register_form', {
+                                    "name": data.data.realName,
+                                    "age": data.data.age,
+                                    "sex": data.data.gender,
+                                    "identity_id": data.data.idNumber,
+                                    "birthday": data.data.birthDate,
+                                    "address": data.data.homeAddress,
+                                });
+
+
+                            })
+                        }
+                    }
+                });
+            });
+            layui.$('#patient_refresh').on('click', function() {
+                $.ajax({
+                    url: "http://localhost:8085/register/initConstant",
+                    type: 'get',
+                    contentType: "application/json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    beforeSend: function() {},
+                    success: function(data) {
+                        if (data.code == 1) {
+                            layer.msg(data.msg, {
+                                icon: 5
+                            });
+                            return false;
+                        } else if (data.code == 0) {
+                            //初始化病历号
+                            $('#record_id').val(data.data.caseNumber[0].name);
+                            caseNum = data.data.caseNumber[0].name;
+                            $('#patient_refresh').removeClass('layui-btn-danger');
+                            $('#patient_refresh').addClass('layui-btn-disabled');
+                            $('#patient_refresh').attr('disabled', true);
+                        }
+                    }
+                });
+            });
+            form.on('select(department)', function(data) {
+                var findDoctorsByDeptId_url = "http://localhost:8085/register/findDoctorsByDeptId/" + data.value;
+                $.ajax({
+                    url: findDoctorsByDeptId_url,
+                    type: 'get',
+                    contentType: "application/json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    beforeSend: function() {},
+                    success: function(data) {
+                        if (data.code == 1) {
+                            layer.msg(data.msg, {
+                                icon: 5,
+                                time: 1000
+                            });
+                            $('#doctor').empty();
+                            form.render();
+                            return false;
+                        } else if (data.code == 0) {
+
+                            $('#doctor').empty();
+                            $('#doctor').append(new Option("请选择看诊医生", ''));
+                            $.each(data.data.doctor, function(index, item) {
+                                $('#doctor').append(new Option(item.name, item.id));
+                            });
+                            form.render();
+
+
+                        }
+                    }
+                });
+
+            });
 
             var count = 0;
             $('.right-bar').css('minHeight', '1000px');
@@ -374,14 +524,21 @@
             });
             //日期
 
-
+            var today = new Date();
+            var month = today.getMonth() + 1;
             laydate.render({
                 elem: '#birthday',
-                theme: '#1f9fff'
+                theme: '#1f9fff',
+                done: function(value, date) {
+                    $('#age').val(today.getFullYear() - date.year);
+                }
             });
             laydate.render({
                 elem: '#visit_date',
-                theme: '#1f9fff'
+                theme: '#1f9fff',
+                min: 0,
+                max: 7,
+                value: today.getFullYear() + "-" + month + "-" + today.getDate()
             });
             element.on('collapse(test)', function(data) {
                 layer.msg('展开状态：' + data.show);
@@ -402,17 +559,30 @@
 
 
             //监听提交
-
+            var payment = 0;
+            var record = 0;
             form.on('select(registLevel)', function(data) {
-                if (data.value == "0") {
-                    form.val('register_form', {
-                        "payment": "10.00"
-                    })
-                } else if (data.value == "1") {
-                    form.val('register_form', {
-                        "payment": "50.00"
-                    })
+                if (data.value == "") {
+                    payment = 0.00;
                 }
+                if (data.value == "1") {
+                    payment = 50;
+                } else if (data.value == "2") {
+                    payment = 8;
+                }
+                form.val('register_form', {
+                    "payment": payment + record
+                });
+            });
+            form.on('switch(record)', function(data) {
+                if (data.elem.checked == true) {
+                    record = 9;
+                } else {
+                    record = 0;
+                }
+                form.val('register_form', {
+                    "payment": payment + record
+                });
             });
             //表单赋值
             layui.$('#value').on('click', function() {
@@ -422,7 +592,7 @@
                     "name": "张三",
                     "age": "20",
                     "ageType": "0",
-                    "sex": "0",
+                    "sex": "71",
                     "identity_id": "420281200008290836",
                     "birthday": "2000-08-29",
                     "address": "湖南省株洲市荷塘区东湖阳光",
@@ -431,10 +601,9 @@
                     "department": "1",
                     "registLevel": "1",
                     "doctor": "1",
-                    "record": true,
+                    "record": false,
                     "payment": "50.00",
-
-                    "payType": "1"
+                    "payType": "51"
 
                 });
             });
@@ -461,10 +630,53 @@
                 });
             });
             form.on('submit(do_register)', function(data) {
-                console.log(form.val);
-                layer.alert(JSON.stringify(data.field), {
-                    title: '最终的提交信息'
+                layer.open({
+                    type: 1,
+                    title: '提交挂号单',
+                    closeBtn: false,
+                    area: '300px;',
+                    shade: 0.4,
+                    id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,
+                    btn: ['确认提交', '取消'],
+                    btnAlign: 'c',
+                    moveType: 1 //拖拽模式，0或者1
+                        ,
+                    content: '<div style="padding: 30px; line-height: 22px; color: #000;">确认提交此挂号单？</div>',
+                    success: function(layero) {
+                        var btn = layero.find('.layui-layer-btn');
+                        btn.find('.layui-layer-btn0').on('click', function() {
+                            $.ajax({
+                                url: "http://localhost:8085/register/submit",
+                                type: 'post',
+                                data: JSON.stringify(data.field),
+                                contentType: "application/json",
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                beforeSend: function() {
+                                    console.log(data.field);
+                                },
+                                success: function(data) {
+                                    if (data.code == 1) {
+                                        layer.msg(data.msg, {
+                                            icon: 5
+                                        });
+                                        return false;
+                                    } else if (data.code == 0) {
+                                        layer.msg(data.msg, {
+                                            icon: 6, //成功的表情
+                                            time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                        });
+
+                                    }
+                                }
+                            })
+                        })
+                    }
                 });
+
+
                 return false;
             });
 

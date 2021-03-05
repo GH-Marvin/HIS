@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>退号</title>
+    <title>退费</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -162,7 +162,7 @@
                     <a href="#baseInfo">基本信息</a>
                 </li>
                 <li>
-                    <a href="#registerInfo">挂号信息</a>
+                    <a href="#registerInfo">退费信息</a>
                 </li>
 
             </ul>
@@ -174,13 +174,13 @@
             <!-- 页眉 -->
             <div class="page_header">
                 <div class="left_pageHeader">Neuedu</div>
-                <div class="center_pageHeader">退号前台</div>
+                <div class="center_pageHeader">退费前台</div>
                 <div class="right_pageHeader">Ver: 1.0.0-0.0.0</div>
             </div>
             <!-- 头部标签 -->
             <div class="title1"></div>
             <div class="title2">
-                <h1>退号明细表</h1>
+                <h1>退费填写表</h1>
             </div>
             <!-- 内容 -->
             <div style="margin-top: 150px;">
@@ -228,18 +228,18 @@
                 </div>
 
 
-                <!-- 患者挂号信息展示 -->
+                <!-- 患者缴费信息展示 -->
                 <fieldset class="layui-elem-field layui-field-title">
-                    <legend style="font-weight: 600;"><a name="searchInfo">挂号信息</a></legend>
+                    <legend style="font-weight: 600;"><a name="searchInfo">缴费信息</a></legend>
                 </fieldset>
 
                 <div class="layui-form-item" style="width: 620px;margin-bottom: 37px;width: 680px;">
-                    <table class="layui-hide" id="register_details" lay-filter="register_details"></table>
+                    <table class="layui-hide" id="payment_details" lay-filter="payment_details"></table>
                 </div>
 
 
                 <script id="toolbarDemo" type="text/html">
-                    <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="getCheckData"><i class="layui-icon layui-icon-delete"></i>立即退号</button>
+                    <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="getCheckData"><i class="layui-icon layui-icon-delete"></i>立即退费</button>
                 </script>
 
             </div>
@@ -259,7 +259,6 @@
             layer.config({
                 extend: 'myskin/style.css' //加载layer皮肤模块
             });
-
             var user_id = "";
             $().ready(function() {
                 user_id = $.cookie("registerId_cookie");
@@ -316,22 +315,22 @@
                 });
             });
 
-            // 【退号单-挂号信息-->患者挂号明细表格】表格绑定
+            // 【退费单-退费信息-->患者退费明细表格】表格绑定
             table.render({
-                elem: '#register_details',
+                elem: '#payment_details',
                 toolbar: '#toolbarDemo',
                 skin: 'line',
                 size: 'sm',
                 even: true,
                 text: {
-                    none: '暂无该用户的挂号信息！'
+                    none: '暂无该用户的缴费信息！'
                 },
                 cols: [
                     [{
                             type: 'checkbox',
 
                         }, {
-                            field: 'regist_id',
+                            field: 'pc_id',
                             title: 'id',
                             width: 74,
                             hide: true
@@ -347,30 +346,31 @@
                             title: '姓名',
                             width: 60
                         }, {
-                            field: 'identity_id',
-                            title: '身份证号',
-                            width: 120
+                            field: 'project_name',
+                            title: '项目名称',
+                            width: 130
                         }, {
-                            field: 'visit_date',
-                            title: '挂号日期',
-                            width: 110,
+                            field: 'price',
+                            title: '项目单价',
+                            sort: true,
+                            width: 80,
                             templet: function(res) {
-                                return '<strong>' + res.visit_date + '</strong>'
+                                return '<strong>' + res.price + '</strong>'
                             }
                         }, {
-                            field: 'day_type',
-                            title: '挂号午别',
-                            width: 85,
+                            field: 'num',
+                            title: '数量',
+                            width: 55,
                             sort: true,
                             totalRow: true
                         }, {
-                            field: 'dept',
-                            title: '看诊科室',
-                            width: 100
+                            field: 'pay_time',
+                            title: '支付时间',
+                            width: 150
 
                         }, {
-                            field: 'visit_state',
-                            title: '看诊状态',
+                            field: 'state',
+                            title: '状态',
                             width: 80
                         }
 
@@ -379,7 +379,7 @@
                 data: [],
                 page: false
             });
-            // 【退号单-->查询按钮】根据regist_id查询患者信息及挂号信息
+            // 【支付单-->查询按钮】根据regist_id查询患者信息及缴费信息
             layui.$('#patient_search').on('click', function() {
                 var record_id = $('#record_id').val();
                 var url = "http://localhost:8085/register/findById/" + record_id;
@@ -403,8 +403,8 @@
                                 "identity_id": data.data.idNumber,
                                 "address": data.data.homeAddress
                             });
-                            table.reload('register_details', {
-                                url: 'http://localhost:8085/back/findRegisterDetailsById',
+                            table.reload('payment_details', {
+                                url: 'http://localhost:8085/back/findPaymentDetailsById',
                                 where: {
                                     caseNumber: $('#record_id').val()
                                 }
@@ -420,57 +420,38 @@
 
 
 
-            // 【退号单-->立即退号按钮】传给发票子页面的数据并弹出
-            table.on('toolbar(register_details)', function(obj) {
+            // 【支付单-->收费结算按钮】传给发票子页面的数据并弹出
+            table.on('toolbar(payment_details)', function(obj) {
                 var checkStatus = table.checkStatus(obj.config.id);
                 if (obj.event == 'getCheckData') {
                     var selected_data = checkStatus.data;
                     if (selected_data.length == 0) {
-                        layer.alert("您未选中项目进行退号！", {
+                        layer.alert("您未选中项目进行退费！", {
                             icon: 5
                         });
                     } else {
-                        var regist_id_str = "";
-                        for (let i = 0; i < selected_data.length; i++) {
-                            regist_id_str += selected_data[i].regist_id + "&"
-                        }
-                        layer.confirm('确认对选中项目退号么？', {
-                            skin: 'layer-ext-myskin',
+                        layer.open({
+                            type: 2,
                             anim: 2,
-                            btn: ['退号', '取消']
-                        }, function(index) {
-                            $.ajax({
-                                url: "http://localhost:8085/back/backRegister/" + regist_id_str,
-                                type: 'get',
-                                contentType: "application/json",
-                                xhrFields: {
-                                    withCredentials: true
-                                },
-                                beforeSend: function() {},
-                                success: function(data) {
-                                    if (data.code == 1) {
-                                        layer.msg(data.msg, {
-                                            icon: 5
-                                        });
-                                        return false;
-                                    } else if (data.code == 0) {
-                                        layer.msg(data.msg, {
-                                            icon: 6, //成功的表情
-                                            time: 700 //关闭（如果不配置，默认是3秒）
-                                        });
-                                        table.reload('register_details', {
-                                            url: 'http://localhost:8085/back/findRegisterDetailsById',
-                                            where: {
-                                                caseNumber: $('#record_id').val()
-                                            }
-                                        }); //只重载数据
-
-                                    }
-                                }
-                            })
-                            layer.close(index);
-
+                            title: '退费明细',
+                            area: ['31%', '70%'],
+                            skin: 'layer-ext-myskin',
+                            offset: [
+                                0.15 * ($(window).height()), 0.34 * ($(window).width())
+                            ],
+                            shade: 0.3,
+                            content: "backBill.html",
+                            btn: ["确认退费", "取消"],
+                            success: function(layero, index) {
+                                var iframe = window['layui-layer-iframe' + index];
+                                iframe.child(selected_data, user_id);
+                            },
+                            yes: function(index, layero) {
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                            }
                         });
+
                     }
 
                 }

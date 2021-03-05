@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="layui/css/register.css">
     <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
     <style>
+        /* form样式重建 */
+        
         .layui-form-item {
             margin-top: 14px;
             margin-left: 40px;
@@ -28,6 +30,7 @@
         .layui-input:focus {
             border: #409eff 2px solid;
         }
+        /* 右侧快捷栏--目录功能样式 */
         
         .layui-card {
             position: fixed;
@@ -82,6 +85,7 @@
             background-color: #393d49;
             color: #fff;
         }
+        /* 右侧快捷栏--搜索样式 */
         
         .search {
             position: fixed;
@@ -173,7 +177,7 @@
                         </div>
                     </div>
                     <div class="layui-inline">
-                        <button class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-search"></i>查询</button>
+                        <button class="layui-btn layui-btn-normal" id="patient_search"><i class="layui-icon layui-icon-search"></i>查询</button>
                     </div>
                 </div>
                 <!-- 患者基本信息展示 -->
@@ -210,7 +214,7 @@
                 </fieldset>
 
                 <div class="layui-form-item" style="width: 620px;margin-bottom: 37px;width: 680px;">
-                    <table class="layui-hide" id="tab" lay-filter="tab"></table>
+                    <table class="layui-hide" id="payment_details" lay-filter="payment_details"></table>
                 </div>
 
 
@@ -222,6 +226,9 @@
         </div>
     </form>
     <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="jquery/jquery.min.js"></script>
+    <script src="jquery/jquery.cookie.js"></script>
+
     <script>
         layui.use(['form', 'element', 'table'], function() {
             var form = layui.form,
@@ -229,12 +236,15 @@
                 $ = layui.jquery,
                 element = layui.element,
                 table = layui.table;
-
+            layer.config({
+                extend: 'myskin/style.css' //加载layer皮肤模块
+            });
+            var user_id = "";
+            $().ready(function() {
+                user_id = $.cookie("registerId_cookie");
+            });
+            // 【右侧快捷栏-->目录功能】图标单击事件
             var count = 0;
-
-
-
-
             $('#form_lab').on('click', function() {
                 count++;
                 switch (count % 2) {
@@ -247,12 +257,13 @@
                 }
 
             });
-
+            // 【右侧快捷栏-->目录功能】关闭功能
             $('.close').on('click', function() {
                 add++;
                 $('#lab').css('display', 'none');
             });
             var add = 0;
+            // 【右侧快捷栏-->搜索功能】图标单击事件
             $('#search').on('click', function() {
                 add++;
                 switch (add % 2) {
@@ -265,22 +276,49 @@
                 }
 
             });
+            // 【右侧快捷栏-->赋值功能】
+            layui.$('#value').on('click', function() {
+                form.val('pay_form', {
+                    "record_id": "600601",
+                    "name": "张三",
+                    "identity_id": "420281200008290836",
+                    "address": "湖南省株洲市荷塘区东湖阳光"
+                });
+            });
+            // 【右侧快捷栏-->清空功能】
+            layui.$('#clear').on('click', function() {
+                form.val('pay_form', {
+                    "record_id": "",
+                    "name": "",
+                    "identity_id": "",
+                    "address": ""
+                });
+            });
 
+            // 【支付单-缴费信息-->患者缴费明细表格】表格绑定
             table.render({
-                elem: '#tab',
+                elem: '#payment_details',
                 toolbar: '#toolbarDemo',
-                height: '400px',
                 skin: 'line',
                 size: 'sm',
                 even: true,
+                text: {
+                    none: '暂无该用户的缴费信息！'
+                },
                 cols: [
                     [{
                             type: 'checkbox',
 
                         }, {
+                            field: 'pc_id',
+                            title: 'id',
+                            width: 74,
+                            hide: true
+
+                        }, {
                             field: 'record_id',
                             title: '病历号',
-                            width: 80,
+                            width: 74,
 
 
                         }, {
@@ -290,7 +328,7 @@
                         }, {
                             field: 'project_name',
                             title: '项目名称',
-                            width: 107
+                            width: 130
                         }, {
                             field: 'price',
                             title: '项目单价',
@@ -311,162 +349,94 @@
                             width: 150
 
                         }, {
-                            field: 'state',
+                            field: 'prescription_state',
                             title: '开立状态',
                             width: 80
                         }
 
                     ]
                 ],
-                data: [{
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "999感冒灵",
-                    "price": "10.50",
-                    "num": "3",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }, {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "project_name": "咽炎片",
-                    "price": "15.50",
-                    "num": "2",
-                    "dig_time": "2020-07-14 17:00:00",
-                    "state": "已开立",
-                }],
-                count: 5,
-                page: true
+                data: [],
+                page: false
+            });
+            // 【支付单-->查询按钮】根据regist_id查询患者信息及缴费信息
+            layui.$('#patient_search').on('click', function() {
+                var record_id = $('#record_id').val();
+                var url = "http://localhost:8085/register/findById/" + record_id;
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    contentType: "application/json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    beforeSend: function() {},
+                    success: function(data) {
+                        if (data.code == 1) {
+                            layer.msg(data.msg, {
+                                icon: 5
+                            });
+                            return false;
+                        } else if (data.code == 0) {
+                            form.val('pay_form', {
+                                "name": data.data.realName,
+                                "identity_id": data.data.idNumber,
+                                "address": data.data.homeAddress
+                            });
+                            table.reload('payment_details', {
+                                url: 'http://localhost:8085/pay/findPaymentDetailsById',
+                                where: {
+                                    caseNumber: $('#record_id').val()
+                                }
+                            }); //只重载数据
+                            var height = $(".form .layui-table-box").height();
+                            $(".form").css('height', (height + 1000) + 'px');
+                        }
+                    }
+                })
+                return false;
+
             });
 
-            // 传给发票iframe的数据
-            var total_price = 0;
-            var bill_recordId = "";
-            var bill_name = "";
-            table.on('toolbar(tab)', function(obj) {
+
+
+            // 【支付单-->收费结算按钮】传给发票子页面的数据并弹出
+            table.on('toolbar(payment_details)', function(obj) {
                 var checkStatus = table.checkStatus(obj.config.id);
                 if (obj.event == 'getCheckData') {
                     var selected_data = checkStatus.data;
-                    bill_recordId = selected_data[0].record_id;
-                    bill_name = selected_data[0].name;
-                    for (let i = 0; i < selected_data.length; i++) {
-                        total_price += selected_data[i].price * selected_data[i].num;
+                    if (selected_data.length == 0) {
+                        layer.alert("您未选中项目进行缴费！", {
+                            icon: 5
+                        });
+                    } else {
+                        layer.open({
+                            type: 2,
+                            anim: 2,
+                            title: '收费明细',
+                            area: ['54%', '70%'],
+                            offset: [
+                                0.15 * ($(window).height()), 0.23 * ($(window).width())
+                            ],
+                            shade: 0.3,
+                            content: "bill.html",
+                            btn: ["确认缴费", "取消"],
+                            success: function(layero, index) {
+                                var iframe = window['layui-layer-iframe' + index];
+                                iframe.child(selected_data, user_id);
+                            },
+                            yes: function(index, layero) {
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                            }
+                        });
 
                     }
-                    console.log(total_price);
-                    layer.open({
-                        type: 2 //此处以iframe举例
-                            ,
-                        title: '收费明细',
-                        area: ['55%', '70%'],
-                        offset: [
-                            0.14 * ($(window).height()), 0.225 * ($(window).width())
-                        ],
-                        shade: 0.3,
-                        content: "bill.html",
-                        btn: ["确认", "取消"]
-                    });
-                    return false;
+
                 }
                 return false;
             });
 
-            layui.$('#value').on('click', function() {
-                form.val('pay_form', {
-                    "record_id": "600601",
-                    "name": "张三",
-                    "identity_id": "420281200008290836",
-                    "address": "湖南省株洲市荷塘区东湖阳光"
-                });
-            });
-            layui.$('#clear').on('click', function() {
-                form.val('pay_form', {
-                    "record_id": "",
-                    "name": "",
-                    "identity_id": "",
-                    "address": ""
-                });
-            });
 
 
 

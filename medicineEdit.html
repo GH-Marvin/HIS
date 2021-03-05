@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="layui/css/register.css">
+    <style>
+        .layui-form-item {
+            font-size: 12px;
+            margin-bottom: 3px;
+            margin-left: 30px;
+        }
+        
+        .layui-form-pane .layui-form-label {
+            height: 30px;
+            line-height: 30px;
+            padding: 0px 15px;
+            background-color: #fff;
+        }
+        
+        .layui-input,
+        .layui-select {
+            width: 230px;
+            height: 30px;
+            line-height: 30px;
+        }
+        
+        .layui-input:hover,
+        .layui-textarea:hover {
+            border-color: #fd7418!important;
+        }
+        
+        .layui-input:focus {
+            border-color: #fd7418!important;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form layui-form-pane" action="" style="margin-top: 15px;">
+        <div class="layui-form-item">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="background-color:#fd7418;color: #fff;border-color: #fd7418;">药品名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" id="name" lay-verify="required|name" autocomplete="off" placeholder="请输入药品名称" class="layui-input" style="border-color: #fd7418;" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item layui-hide">
+                <label class="layui-form-label">药品id</label>
+                <div class="layui-input-block">
+                    <input type="text" name="drugs_id" id="drugs_id" lay-verify="required|drugs_id" autocomplete="off" placeholder="请输入药品编码" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item layui-hide">
+                <label class="layui-form-label">处方id</label>
+                <div class="layui-input-block">
+                    <input type="text" name="pid" id="pid" lay-verify="required|pid" autocomplete="off" placeholder="请输入药品编码" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品编码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="code" id="code" lay-verify="required|code" autocomplete="off" placeholder="请输入药品编码" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品规格</label>
+                <div class="layui-input-block">
+                    <input type="text" name="format" id="format" lay-verify="required|format" autocomplete="off" placeholder="请输入药品规格" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品价格</label>
+                <div class="layui-input-block">
+                    <input type="text" name="price" id="price" lay-verify="required|price" autocomplete="off" placeholder="请输入标题" class="layui-input" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品用法</label>
+                <div class="layui-input-block">
+                    <input type="text" name="use" id="use" lay-verify="required|use" autocomplete="off" placeholder="请输入用法" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品用量</label>
+                <div class="layui-input-block">
+                    <input type="text" name="dosage" id="dosage" lay-verify="required|dosage" autocomplete="off" placeholder="请输入用量" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">药品频次</label>
+                <div class="layui-input-block">
+                    <input type="text" name="frequency" id="frequency" lay-verify="required|frequency" autocomplete="off" placeholder="请输入频次" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数量</label>
+                <div class="layui-input-block">
+                    <input type="text" name="amount" id="amount" lay-verify="required|amount" autocomplete="off" placeholder="请输入数量" class="layui-input">
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-form-item layui-hide">
+            <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit" value="确认添加">
+
+        </div>
+    </form>
+
+    <script src="layui/layui.js"></script>
+    <script src="jquery/jquery.min.js"></script>
+    <script>
+        function child(obj) {
+            $("#code").val(obj.data.code);
+            $("#name").val(obj.data.name);
+            $("#format").val(obj.data.format);
+            $("#price").val(obj.data.price);
+            $("#drugs_id").val(obj.data.id);
+            $('#pid').val(obj.pid);
+        }
+    </script>
+    <script>
+        layui.use(['form', 'layedit', 'element', 'table', 'laydate'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                layedit = layui.layedit,
+                element = layui.element,
+                table = layui.table,
+                $ = layui.jquery,
+                laydate = layui.laydate;
+            form.on('submit(layuiadmin-app-form-submit)', function(data) {
+                $.ajax({
+                    url: "http://localhost:8085/prescribe/saveMedicine",
+                    type: 'post',
+                    data: JSON.stringify(data.field),
+                    contentType: "application/json",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    beforeSend: function() {
+                        console.log(data.field);
+                    },
+                    success: function(data) {
+                        if (data.code == 1) {
+                            layer.msg(data.msg, {
+                                icon: 5
+                            });
+                            return false;
+                        } else if (data.code == 0) {
+                            parent.parent.layer.msg(data.msg, {
+                                icon: 6, //成功的表情
+                                time: 2000 //1秒关闭（如果不配置，默认是3秒）
+                            });
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.parent.layui.table.reload('prescription_item', {
+                                url: 'http://localhost:8085/prescribe/initPrescriptionDetailedList',
+                                page: {
+                                    curr: 1 //重新从第 1 页开始
+                                },
+                                where: {
+                                    id: $('#pid').val()
+                                }
+                            }); //只重载数据
+                            parent.parent.layer.closeAll();
+                        }
+                    }
+                })
+
+            });
+        });
+    </script>
+</body>
+
+</html>

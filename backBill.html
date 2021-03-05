@@ -10,65 +10,57 @@
     <link rel="stylesheet" href="layui/css/layui.css" media="all">
     <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
 </head>
+<style>
+    .div {
+        margin: auto;
+    }
+    
+    .layui-form-item {
+        margin: 0 0px;
+        width: 350px;
+    }
+</style>
 
 <body>
     <form class="layui-form layui-form-pane" action="">
         <br>
         <br>
-        <div class="layui-form-item" style="padding-left: 45px">
+        <div class="layui-form-item" style="padding-left: 30px">
             <div class="layui-inline">
-                <label class="layui-form-label" style="color: white;background-color: #1e9fff;border-color: #1e9fff">发票号</label>
+                <label class="layui-form-label" style="color: white;background-color: #1e9fff;border-color: #1e9fff">冲红发票</label>
                 <div class="layui-input-inline">
                     <input style="border-color: #1e9fff" lay-verify="required|bill_id" id="bill_id" id="bill_id" type="text" name="bill_id" autocomplete="off" class="layui-input" required>
                 </div>
             </div>
+
+        </div>
+        <div class="layui-form-item" style="padding-left: 30px">
             <div class="layui-inline">
-                <label class="layui-form-label">病历号</label>
+                <label class="layui-form-label">病历号码</label>
                 <div class="layui-input-inline">
                     <input type="text" lay-verify="required|record_id" id="record_id" name="record_id" autocomplete="off" class="layui-input" required>
                 </div>
             </div>
         </div>
-        <div class="layui-form-item" style="padding-left: 45px">
+        <div class="layui-form-item" style="padding-left: 30px">
             <div class="layui-inline">
                 <label class="layui-form-label">患者姓名</label>
                 <div class="layui-input-inline">
                     <input type="text" lay-verify="required|name" id="name" name="name" autocomplete="off" class="layui-input" disabled>
                 </div>
             </div>
+
+        </div>
+        <div class="layui-form-item" style="padding-left: 30px">
             <div class="layui-inline">
-                <label class="layui-form-label">支付方式</label>
+                <label class="layui-form-label">应退金额</label>
                 <div class="layui-input-inline">
-                    <select lay-verify="required|payType" name="payType" id="payType" lay-filter="payType">
-                    <option value="">请选择支付方式</option>
-                    <option value="1">现金</option>
-                    <option value="2">支付宝</option>
-                    <option value="3">银行卡</option>
-                </select>
+                    <input lay-verify="required|should_pay" id="should_pay" type="text" name="should_pay" autocomplete="off" class="layui-input" style="color: #1e9fff;font-weight: 600;font-size: medium;" disabled>
                 </div>
             </div>
         </div>
-        <div class="layui-form-item" style="padding-left: 45px">
-            <div class="layui-inline">
-                <label class="layui-form-label">应收金额</label>
-                <div class="layui-input-inline">
-                    <input lay-verify="required|should_pay" id="should_pay" type="text" name="should_pay" autocomplete="off" class="layui-input" disabled>
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">实收金额</label>
-                <div class="layui-input-inline">
-                    <input type="text" lay-verify="required|fact_pay" id="fact_pay" name="fact_pay" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item" style="padding-left: 45px">
-            <div class="layui-inline">
-                <label class="layui-form-label" id="back_pay_label">找零金额</label>
-                <div class="layui-input-inline">
-                    <input lay-verify="required|back_pay" name="back_pay" id="back_pay" type="text" autocomplete="off" class="layui-input" disabled>
-                </div>
-            </div>
+        <div class="layui-form-item" style="padding-left: 30px">
+
             <div class="layui-inline layui-hide">
                 <label class="layui-form-label" id="back_pay_label">id</label>
                 <div class="layui-input-inline">
@@ -76,7 +68,7 @@
                 </div>
             </div>
             <div class="layui-inline layui-hide">
-                <label class="layui-form-label">user_id</label>
+                <label class="layui-form-label" id="back_pay_label">user_id</label>
                 <div class="layui-input-inline">
                     <input lay-verify="required|user_id" id="user_id" type="text" name="user_id" autocomplete="off" class="layui-input" disabled>
                 </div>
@@ -131,34 +123,17 @@
                 } else if (data.code == 0) {
                     //初始化发票号
                     $('#bill_id').val(data.data.bill_id[0].name);
-                    //初始化支付方式下拉框
-                    $('#payType').empty();
-                    $('#payType').append(new Option("请选择支付方式", ''));
-                    $.each(data.data.pay, function(index, item) {
-                        $('#payType').append(new Option(item.name, item.id));
-                    });
-                    form.render();
+
                 }
             }
         });
 
-        // 【发票单-->找零功能】
-        $("#fact_pay").change(function() {
-            var a = $("#should_pay").val();
-            var b = $("#fact_pay").val();
-            console.log(a);
-            console.log(b);
-            var c = (b - a).toFixed(2);
-            $("#back_pay").val(c);
-            $("#back_pay_label").css("background-color", "#ff5722").css("color", "#fff").css("border-color", "#ff5722");
-            $('#back_pay').css("border", "2px solid #ff5722").css("color", "#ff5722").css("font-weight", "600");
-        });
 
         // 【发票单-->确认缴费】
         form.on('submit(layuiadmin-app-form-submit)', function(data) {
 
             $.ajax({
-                url: "http://localhost:8085/pay/submit",
+                url: "http://localhost:8085/back/backPay",
                 type: 'post',
                 data: JSON.stringify(data.field),
                 contentType: "application/json",
@@ -181,7 +156,7 @@
                         });
                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                         parent.layui.table.reload('payment_details', {
-                            url: 'http://localhost:8085/pay/findPaymentDetailsById',
+                            url: 'http://localhost:8085/back/findPaymentDetailsById',
                             where: {
                                 id: $('#record_id').val()
                             }

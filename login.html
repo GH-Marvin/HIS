@@ -30,13 +30,13 @@
     }
     
     .layui-card {
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(255, 255, 255, 0.96);
         position: absolute;
         width: 445px;
         height: 470px;
         top: 135px;
         right: 190px;
-        border-radius: 15px;
+        border-radius: 10px;
         z-index: 1000;
     }
     
@@ -182,7 +182,24 @@
             }
         });
         //记住账号密码方法
-        function saveUserInfo() {
+        function saveUserInfo(realname, registerId, dept, deptId) {
+            var realname_cookie = realname;
+            var registerId_cookie = registerId;
+            var dept_cookie = dept;
+            var deptId_cookie = deptId;
+            $.cookie("realname_cookie", realname_cookie, {
+                expires: 1
+            });
+            $.cookie("registerId_cookie", registerId_cookie, {
+                expires: 1
+            });
+            $.cookie("dept_cookie", dept_cookie, {
+                expires: 1
+            });
+            $.cookie("deptId_cookie", deptId_cookie, {
+                expires: 1
+            });
+
             if ($("#remember").is(':checked')) {
                 console.log("[log]账号密码已保存！")
                 var username_cookie = $("#username").val();
@@ -196,6 +213,7 @@
                 $.cookie("password_cookie", password_cookie, {
                     expires: 7
                 });
+
                 // 存储一个带7天期限的 cookie 
             } else {
                 console.log("[log]账号密码已取消！")
@@ -208,6 +226,7 @@
                 $.cookie("password_cookie", '', {
                     expires: -1
                 });
+
             }
         }
     </script>
@@ -256,7 +275,7 @@
 
                 if (slider.isOk()) {
                     $.ajax({
-                        url: "http://localhost:8080/user/login",
+                        url: "http://localhost:8085/user/login",
                         type: 'post',
                         data: JSON.stringify(data.field),
                         contentType: "application/json",
@@ -277,8 +296,8 @@
                                     icon: 6, //成功的表情
                                     time: 1000 //1秒关闭（如果不配置，默认是3秒）
                                 }, function() {
-                                    window.location.href = data.data + ".html";
-                                    saveUserInfo();
+                                    window.location.href = data.data.page + ".html";
+                                    saveUserInfo(data.data.realname, data.data.registerId, data.data.dept, data.data.deptId);
                                 });
                             }
                         }

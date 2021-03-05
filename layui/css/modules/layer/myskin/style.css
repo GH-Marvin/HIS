@@ -1,0 +1,10 @@
+/*  
+通过body前缀，是为了确保你皮肤的优先级
+你可以通过调试工具重置更多样式 
+*/
+
+body .layer-ext-myskin .layui-layer-btn0 {
+    border-color: #ff5722;
+    background-color: #ff5722;
+    color: #fff;
+}

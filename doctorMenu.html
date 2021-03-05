@@ -50,7 +50,8 @@
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
                     <a href="javascript:;">
-                        <i class="layui-icon layui-icon-user"></i> 医生
+                        <i class="layui-icon layui-icon-user"></i>
+						<cite id="realname"></cite>
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="">基本资料</a></dd>
@@ -134,7 +135,13 @@
     </div>
     <script src="layui/layui.js"></script>
     <script src="jquery/jquery.min.js"></script>
+	<script src="jquery/jquery.cookie.js"></script>
     <script>
+		$().ready(function() {
+			var mydiv = document.getElementById("realname");
+			mydiv.innerHTML = $.cookie("realname_cookie");
+			
+		});
         //JavaScript代码区域
         layui.use(['form', 'layedit', 'laydate', 'element'], function() {
             var form = layui.form,

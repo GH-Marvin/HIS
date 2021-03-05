@@ -143,6 +143,18 @@
             font-size: 16px;
         }
         
+        .list_refresh {
+            position: absolute;
+            width: 20px;
+            line-height: 20px;
+            height: 20px;
+            padding-left: 2px;
+            top: 10px;
+            right: 36px;
+            color: #c2c2c2;
+            font-size: 16px;
+        }
+        
         .layui-card-header .close:hover {
             cursor: pointer;
         }
@@ -243,6 +255,7 @@
     <!-- 右侧患者列表功能（隐藏） -->
     <div class="layui-card" id="list_content" style="top: 110px;width: 300px;display: block;height: 390px;">
         <div class="layui-card-header">患者列表
+            <a class="list_refresh layui-icon layui-icon-refresh"></a>
             <a class="list_close layui-icon layui-icon-next"></a>
         </div>
         <div class="layui-card-body">
@@ -267,11 +280,11 @@
     </div>
 
     <form class="layui-form layui-form-pane" action="" lay-filter="diagnose_form">
-        <div class="form w" style="width: 750px;height: 1300px;margin-left: 80px;" id="content_form">
+        <div class="form w" style="width: 750px;height: 1150px;;margin-left: 80px;" id="content_form">
             <!-- 页眉 -->
             <div class="page_header">
                 <div class="left_pageHeader">Neuedu</div>
-                <div class="center_pageHeader">心血管内科</div>
+                <div class="center_pageHeader" id="dept_name"></div>
                 <div class="right_pageHeader">Ver: 1.0.0-0.0.0</div>
             </div>
             <!-- 头部标签 -->
@@ -298,15 +311,16 @@
                     <div class="layui-inline">
                         <label class="layui-form-label" style="background-color: #1e9fff;color: white;font-weight: bold;border: 1px solid #1e9fff;">病历号</label>
                         <div class="layui-input-inline">
-                            <input type="text" id="record_id" style="border: 2px solid #1e9fff;" name="record_id" autocomplete="off" class="layui-input" disabled>
+                            <input type="text" id="record_id" style="border: 2px solid #1e9fff;" name="record_id" autocomplete="off" class="layui-input" lay-verify="required|record_id" disabled>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">姓名</label>
                         <div class="layui-input-inline">
-                            <input type="text" id="name" name="name" autocomplete="off" class="layui-input" disabled>
+                            <input type="text" id="name" name="name" autocomplete="off" class="layui-input" lay-verify="required|name" disabled>
                         </div>
                     </div>
+
                     <div class="layui-inline">
                         <label class="layui-form-label">性别</label>
                         <div class="layui-input-inline">
@@ -317,6 +331,12 @@
                         <label class="layui-form-label">年龄</label>
                         <div class="layui-input-inline">
                             <input type="text" id="age" name="age" autocomplete="off" class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <label class="layui-form-label">挂号单id</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="regist_id" name="regist_id" autocomplete="off" class="layui-input" disabled>
                         </div>
                     </div>
 
@@ -330,13 +350,13 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">主诉</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|complain" id="complain" name="complain"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="complain" name="complain"></textarea>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">现病史</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|ill_history" id="ill_history" name="ill_history"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="ill_history" name="ill_history"></textarea>
                         </div>
                     </div>
                 </div>
@@ -345,13 +365,13 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">现病治疗情况</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|treat_condition" id="treat_condition" name="treat_condition"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="treat_condition" name="treat_condition"></textarea>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">既往史</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|pre_history" id="pre_history" name="pre_history"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="pre_history" name="pre_history"></textarea>
                         </div>
                     </div>
 
@@ -361,13 +381,13 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">过敏史</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|allergy" id="allergy" name="allergy"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="allergy" name="allergy"></textarea>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">体格检查</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|health_checkup" id="health_checkup" name="health_checkup"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="health_checkup" name="health_checkup"></textarea>
                         </div>
                     </div>
 
@@ -378,7 +398,7 @@
                     <legend><a name="diagnose">评估/诊断</a></legend>
                 </fieldset>
                 <div class="layui-form-item" style="margin-bottom: 37px;width: 658px;">
-                    <table class="layui-table" id="westDiagnose" lay-filter="westDiagnose"></table>
+                    <table class="layui-table" id="westDiagnose" lay-filter="westDiagnose" name="westDiagnose"></table>
                 </div>
                 <!-- 西医诊断表头 -->
                 <script id="diagnosis_toolbar" type="text/html">
@@ -398,20 +418,27 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">检查建议</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|check_advice" id="check_advice" name="check_advice"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="check_advice" name="check_advice"></textarea>
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">注意事项</label>
                         <div class="layui-input-block">
-                            <textarea placeholder="请输入内容" class="layui-textarea" lay-verify="required|attention" id="attention" name="attention"></textarea>
+                            <textarea placeholder="请输入内容" class="layui-textarea" id="attention" name="attention"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+    <div class="layui-form-item layui-hide">
+        <input type="text" class="layui-input" id="diagnosis_content">
+        <input type="text" class="layui-input" id="diagnosis_time">
+    </div>
     <script src="layui/layui.js" charset="utf-8"></script>
+    <script src="jquery/jquery.min.js"></script>
+    <script src="jquery/jquery.cookie.js"></script>
+
     <script>
         layui.use(['form', 'layedit', 'table', "element"], function() {
             var form = layui.form,
@@ -419,7 +446,17 @@
                 table = layui.table,
                 $ = layui.jquery,
                 element = layui.element;
-
+            layer.config({
+                extend: 'myskin/style.css' //加载layer皮肤模块
+            });
+            var doctor_id = "";
+            $().ready(function() {
+                doctor_id = $.cookie("registerId_cookie");
+                dept_name = $.cookie("dept_cookie");
+                console.log("当前医生id：" + doctor_id);
+                console.log("当前科室：" + $.cookie("dept_cookie"));
+                document.getElementById('dept_name').innerHTML = $.cookie("dept_cookie");
+            });
 
             var lab_count = 0;
             var search_count = 0;
@@ -497,32 +534,65 @@
                 }
 
             });
+
             table.on('toolbar(westDiagnose)', function(obj) {
                 if (obj.event == 'add') {
                     layer.open({
                         type: 2,
                         title: '添加西医诊断',
-                        area: ['50%', '83%'],
+                        area: ['60%', '86%'],
                         offset: [
-                            0.1 * ($(window).height()), 0.24 * ($(window).width())
+                            0.08 * ($(window).height()), 0.2 * ($(window).width())
                         ],
                         shade: 0.5,
                         content: "west_diagnosis.html",
-                        btn: ["添加", "取消"]
+                        btn: ["添加", "取消"],
+                        success: function(layero, index) {
+                            var btn = layero.find('.layui-layer-btn');
+                            btn.find('.layui-layer-btn0').on('click', function() {
+                                var iframe = window['layui-layer-iframe' + index]; // 找到iframe层
+                                tableBak = JSON.stringify(layui.table.cache["westDiagnose"]);
+                                iframe.child(tableBak);
+                                //点击确认触发 iframe 内容中的按钮提交
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                                var data = $('#diagnosis_content').val();
+                                table.reload('westDiagnose', {
+                                    data: JSON.parse(data)
+                                });
+                                //动态加载表单高度
+                                var height = $(".form .layui-table-box").height();
+                                $(".form").css('height', (height + 1100) + 'px');
+
+                            });
+                        }
                     });
 
                 }
             });
 
-
-
+            $('.list_refresh').on('click', function() {
+                table.reload('waiting', {
+                    url: 'http://localhost:8085/diagnose/initWaitingList/' + doctor_id,
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                }); //只重载数据
+                table.reload('done', {
+                    url: 'http://localhost:8085/diagnose/initDoneList/' + doctor_id,
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                }); //只重载数据
+            });
             table.render({
                 elem: '#waiting',
                 skin: 'line',
                 size: 'sm',
+                url: 'http://localhost:8085/diagnose/initWaitingList/' + doctor_id,
                 height: 'full',
                 text: {
-                    none: '数据接口异常'
+                    none: '暂无该科室下的病人'
                 },
                 page: {
                     limit: 5,
@@ -546,64 +616,45 @@
                         field: 'age',
                         title: '年龄',
                         width: 69
+                    }, {
+                        field: 'regist_id',
+                        title: '挂号单id',
+                        width: 69,
+                        hide: true
                     }]
                 ],
-                data: [{
-                    "record_id": "600601",
-                    "name": "张三",
-                    "sex": "男",
-                    "age": "18",
+                done: function(res, currentCount) {　　　　　　　　
+                    base = layui.table.cache["waiting"][0];
+                    $(".layui-table-body.layui-table-main tr[data-index='0']").addClass("layui-bg-blue");
+                    if (base != null) {
+                        $("#record_id").val(base.record_id);
+                        $("#name").val(base.name);
+                        $("#sex").val(base.sex);
+                        $("#age").val(base.age);
+                        $("#regist_id").val(base.regist_id);
+                    }
 
-                }, {
-                    "record_id": "600603",
-                    "name": "李四",
-                    "sex": "男",
-                    "age": "19",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }, {
-                    "record_id": "600609",
-                    "name": "李白",
-                    "sex": "男",
-                    "age": "29",
-
-                }]
-
+                }
             });
+            table.on('row(waiting)', function(obj) {
+                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
+                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
+                $("#record_id").val(obj.data.record_id);
+                $("#name").val(obj.data.name);
+                $("#sex").val(obj.data.sex);
+                $("#age").val(obj.data.age);
+                $("#regist_id").val(obj.data.regist_id);
+            });
+
             table.render({
                 elem: '#done',
                 height: 'full',
+                url: 'http://localhost:8085/diagnose/initDoneList/' + doctor_id,
                 skin: 'line',
                 size: 'sm',
+                text: {
+                    none: '该科室下暂无已诊患者'
+                },
                 page: {
                     limit: 5,
                 }, //开启分页
@@ -626,53 +677,32 @@
                         width: 68.4
                     }, , {
                         field: 'west_diagnosis',
-                        title: '年龄',
-                        width: 120
+                        title: '诊断',
+                        width: 120,
+                        hide: true
                     }]
                 ],
-                data: [{
-                    "record_id": "600605",
-                    "name": "王五",
-                    "sex": "男",
-                    "age": "48",
-                    "west_diagnosis": "流行性感冒"
-
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }, {
-                    "record_id": "600607",
-                    "name": "赵六",
-                    "sex": "女",
-                    "age": "29",
-                    "west_diagnosis": "流行性感冒"
-                }]
+                data: []
             });
 
-            table.render({
+            var west = table.render({
                 elem: '#westDiagnose',
                 skin: 'line',
-                page: {
-                    limit: 3
+                id: 'westDiagnose',
+                text: {
+                    none: '无数据'
                 },
                 toolbar: '#diagnosis_toolbar',
                 cols: [
+
                     [{
+                        field: 'id',
+                        title: '疾病id',
+                        width: 140,
+                        align: 'center',
+                        fixed: 'left',
+                        hide: true
+                    }, {
                         field: 'ICD',
                         title: 'ICD编码',
                         width: 140,
@@ -699,43 +729,24 @@
                         toolbar: "#bar",
 
                     }]
+
                 ],
-                data: [{
-                    'ICD': '1',
-                    'description': '伤寒性脑髓炎',
-                    'time': '2020-01-01 00:00:00'
-
-                }, {
-                    'ICD': '2',
-                    'description': '伤寒性脑髓炎',
-                    'time': '2020-01-01 00:00:00'
-
-                }, {
-                    'ICD': '3',
-                    'description': '伤寒性脑髓炎',
-                    'time': '2020-01-01 00:00:00'
-
-                }, {
-                    'ICD': '4',
-                    'description': '伤寒性脑髓炎',
-                    'time': '2020-01-01 00:00:00'
-
-                }]
+                data: []
 
             });
-
-            base = layui.table.cache["waiting"][0];
-            document.getElementById("record_id").value = base.record_id;
-            document.getElementById("name").value = base.name;
-            document.getElementById("sex").value = base.sex;
-            document.getElementById("age").value = base.age;
-            table.on('row(waiting)', function(obj) {
-                obj.tr.addClass("layui-bg-blue").siblings().removeClass("layui-bg-blue");
-                obj.tr.addClass("layui-table-click").siblings().removeClass("layui-table-click");
-                document.getElementById("record_id").value = obj.data.record_id;
-                document.getElementById("name").value = obj.data.name;
-                document.getElementById("sex").value = obj.data.sex;
-                document.getElementById("age").value = obj.data.age;
+            table.on('tool(westDiagnose)', function(obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+                    layer.confirm('确认删除该西医诊断么？', {
+                        skin: 'layer-ext-myskin',
+                        btn: ['删除', '取消']
+                    }, function(index) {
+                        obj.del();
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'edit') {
+                    layer.alert('编辑行：<br>' + JSON.stringify(data))
+                }
             });
 
             form.verify({
@@ -745,13 +756,80 @@
             });
 
             form.on('submit(do_diagnose)', function(data) {
-                layer.alert(JSON.stringify(data.field), {
-                    title: '最终的提交信息',
-                    offset: [
-                        0.1 * $(window).height(),
-                        0.35 * $(window).width()
-                    ]
-                });
+                var field_data = [];
+                var push_data = layui.table.cache['westDiagnose'];
+                if (push_data[0] === undefined || push_data[0].ICD === undefined) {
+                    layer.alert('未添加诊断！', {
+                        title: '开立失败',
+                        icon: 5
+                    })
+                } else {
+
+                    for (let i = 0; i < push_data.length; i++) {
+                        var temp = push_data[i];
+                        field_data.push({
+                            "id": temp.id,
+                            "ICD": temp.ICD,
+                            "description": temp.description,
+                            "time": temp.time
+                        })
+                    }
+                    data.field.data = field_data;
+                    data.field.caseState = "2"; //1-暂存;2-已提交;3-诊毕
+                    data.field.diagnoseCate = "2"; //1-初诊;2-终诊
+                    console.log("提交的病历记录数据：" + JSON.stringify(data.field));
+
+                    layer.open({
+                        type: 1,
+                        title: '提交病历单',
+                        closeBtn: false,
+                        area: '300px;',
+                        shade: 0.4,
+                        id: 'diagnose_layer' //设定一个id，防止重复弹出
+                            ,
+                        btn: ['确认提交', '取消'],
+                        btnAlign: 'c',
+                        moveType: 1 //拖拽模式，0或者1
+                            ,
+                        content: '<div style="padding: 30px; line-height: 22px; color: #000;">确认提交此病历单？</div>',
+                        success: function(layero) {
+                            var btn = layero.find('.layui-layer-btn');
+                            btn.find('.layui-layer-btn0').on('click', function() {
+                                $.ajax({
+                                    url: "http://localhost:8085/diagnose/submit",
+                                    type: 'post',
+                                    data: JSON.stringify(data.field),
+                                    contentType: "application/json",
+                                    xhrFields: {
+                                        withCredentials: true
+                                    },
+                                    beforeSend: function() {
+                                        console.log(data.field);
+                                    },
+                                    success: function(data) {
+                                        if (data.code == 1) {
+                                            layer.msg(data.msg, {
+                                                icon: 5
+                                            });
+                                            return false;
+                                        } else if (data.code == 0) {
+                                            layer.msg(data.msg, {
+                                                icon: 6, //成功的表情
+                                                time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                            });
+                                            $('.list_refresh').click();
+                                        }
+                                    }
+                                })
+                            })
+                        }
+                    });
+                }
+
+
+
+
+
                 return false;
             });
 
@@ -767,6 +845,7 @@
                     "attention": "无"
                 });
             });
+
             layui.$('#clear').on('click', function() {
                 form.val('diagnose_form', {
                     "complain": "",

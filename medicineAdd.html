@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="layui/css/layui.css">
     <link rel="stylesheet" href="layui/css/register.css">
     <style>
-        /* 关闭toolbar */
-        
-        .layui-table-tool-self {
-            display: none;
-        }
         /* 调整表单table样式 */
         
         .layui-table-tool {
@@ -54,20 +49,7 @@
         }
         
         .layui-table-page {
-            height: 35px;
-        }
-        
-        .layui-laypage .layui-laypage-skip,
-        .layui-table-page .layui-laypage select,
-        .layui-table-page .layui-laypage button,
-        .layui-table-page .layui-laypage input {
-            display: none;
-        }
-        
-        .layui-table-page .layui-laypage span {
-            height: 15px;
-            line-height: 15px;
-            margin-bottom: 10px;
+            height: 40px;
         }
         /* 左侧工具栏的table样式 */
         
@@ -83,7 +65,7 @@
         }
         
         .layui-form-item {
-            margin-top: 14px;
+            margin-top: 0px;
             margin-left: 40px;
         }
         
@@ -91,23 +73,61 @@
         .layui-input-inline {
             float: left;
         }
+        
+        body .demo-class {
+            border-radius: 8px;
+        }
+        
+        body .demo-class .layui-layer-title {
+            cursor: pointer;
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #fd7418;
+            color: black;
+            font-weight: 600;
+            font-size: 18px;
+            border: none;
+        }
+        
+        body .demo-class .layui-layer-btn .layui-layer-btn0 {
+            background: #fd7418;
+            border-color: #fd7418;
+        }
+        
+        body .demo-class .layui-layer-btn .layui-layer-btn0 :hover {
+            border-color: transparent;
+        }
     </style>
 </head>
 
 <body>
-    <div class="layui-form-item" style="width: 1100px;margin: auto;margin-top: 20px;">
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label">处方id</label>
+        <div class="layui-input-block">
+            <input type="text" name="pid" id="pid" lay-verify="required|pid" autocomplete="off" placeholder="请输入药品编码" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item" style="width:860px;margin: auto;margin-top: 30px;">
         <table id="add_medicine" lay-filter="add_medicine"></table>
     </div>
 
-    <script type="text/html" id="westDiagnosis_toolbar">
+    <script type="text/html" id="westDiagnosis_toolbar" charset="utf-8">
         <div class="toolbar_title">药品名称：</div>
-        <input type="text" class="layui-input" style="display: inline;height:25px;width:250px;font-size:12px" placeholder="请输入药品名称">
-        <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;width:80px">查询药品</button>
+        <input type="text" class="layui-input" style="display: inline;height:25px;width:250px;font-size:12px" placeholder="请输入药品名称" id="drugs_input">
+        <button class="layui-btn layui-btn-normal layui-btn-sm" style="height:25px;line-height:25px;width:80px" data-type="drugs_reload" id="drugs_search" lay-event="drugs_reload">查询药品</button>
     </script>
     <script type="text/html" id="bar">
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="select">选择</a>
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">选择</a>
     </script>
+
     <script src="layui/layui.js"></script>
+    <script src="jquery/jquery.min.js"></script>
+    <script>
+        function child(data) {
+            $('#pid').val(data);
+        }
+    </script>
     <script>
         layui.use(['form', 'layedit', 'element', 'table', 'laydate'], function() {
             var form = layui.form,
@@ -117,48 +137,55 @@
                 table = layui.table,
                 $ = layui.jquery,
                 laydate = layui.laydate;
-            table.on('tool(add_medicine)', function(obj) {
-                var data = obj.data;
-                if (obj.event === 'select') {
 
-
-                }
-            });
             table.render({
                 elem: '#add_medicine',
+                id: 'add_medicine',
+                url: 'http://localhost:8085/prescribe/initDrugsList',
+                defaultToolbar: ['filter'],
+                text: {
+                    none: '无药品数据'
+                },
                 skin: 'line',
                 page: {
-                    limit: 6,
-                    limits: [6]
+                    limit: 8,
+                    limits: [8]
                 },
                 size: 'sm',
                 toolbar: "#westDiagnosis_toolbar",
                 cols: [
-                    [
-
-                        {
+                    [{
                             field: 'id',
-                            title: '药品编码',
+                            title: '药品id',
                             align: 'center',
                             width: 100,
+                            fixed: 'left',
+                            hide: true
+                        },
+
+                        {
+                            field: 'code',
+                            title: '药品编码',
+                            align: 'left',
+                            width: 140,
                             fixed: 'left'
                         }, {
                             field: 'name',
                             title: '药品名称',
-                            align: 'center',
-                            width: 120,
+                            align: 'left',
+                            width: 190,
                             fixed: 'left'
                         }, {
                             field: 'format',
                             title: '药品规格',
-                            align: 'center',
-                            width: 100,
+                            align: 'left',
+                            width: 129,
                             fixed: 'left'
                         }, {
                             field: 'price',
                             title: '药品单价',
-                            align: 'center',
-                            width: 100,
+                            align: 'left',
+                            width: 90,
                             fixed: 'left'
                         }, {
                             field: 'unit',
@@ -170,38 +197,42 @@
                             field: 'dosage_form',
                             title: '药品剂型',
                             align: 'center',
-                            width: 100,
+                            width: 90,
                             fixed: 'left'
                         }, {
                             field: 'type',
                             title: '药品类型',
                             align: 'center',
-                            width: 100,
+                            width: 90,
                             fixed: 'left'
                         }, {
                             field: 'use',
                             title: '用法',
                             align: 'center',
                             width: 90,
-                            fixed: 'left'
+                            fixed: 'left',
+                            hide: true
                         }, {
                             field: 'dosage',
                             title: '用量',
                             align: 'center',
                             width: 100,
-                            fixed: 'left'
+                            fixed: 'left',
+                            hide: true
                         }, {
                             field: 'frequency',
                             title: '频次',
                             align: 'center',
                             width: 100,
-                            fixed: 'left'
+                            fixed: 'left',
+                            hide: true
                         }, {
                             field: 'num',
                             title: '数量',
                             align: 'center',
                             width: 60,
-                            fixed: 'left'
+                            fixed: 'left',
+                            hide: true
                         }, {
                             field: 'operation',
                             title: '操作',
@@ -212,11 +243,60 @@
                         },
                     ]
                 ],
-                data: [{}]
+                data: []
 
             });
-            //执行一个laydate实例
 
+
+            //根据名称模糊查询药品
+            table.on('toolbar(add_medicine)', function(obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'drugs_reload':
+                        var drugsReload = $('#drugs_input');
+                        console.log(drugsReload.val());
+                        //执行重载
+                        table.reload('drugsReloadTable', {
+                            url: 'http://localhost:8085/prescribe/initDrugsListByName/',
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                name: drugsReload.val()
+                            }
+                        }, 'data');
+                        break;
+                }
+            });
+            table.on('tool(add_medicine)', function(obj) {
+                if (obj.event == 'edit') {
+                    layer.open({
+                        type: 2,
+                        content: 'medicineEdit.html',
+                        skin: 'demo-class',
+                        title: obj.data.name,
+                        area: ['50%', '88%'],
+                        anim: 2,
+                        offset: [
+                            0.06 * ($(window).height()), 0.25 * ($(window).width())
+                        ],
+                        shade: 0.15,
+                        btn: ["保存", "取消"],
+                        success: function(layero, index) {
+                            var iframe = window['layui-layer-iframe' + index];
+                            obj.pid = $('#pid').val();
+                            iframe.child(obj);
+                        },
+                        yes: function(index, layero) {
+                            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                            submit.click();
+                        }
+                    });
+
+
+
+                }
+            });
         });
     </script>
 </body>
